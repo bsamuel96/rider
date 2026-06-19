@@ -1,0 +1,119 @@
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Bell, Car, Headphones, LayoutDashboard, Moon, Sun, UserRound, Wrench } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
+import { useTheme } from "@/hooks/useTheme";
+import { useAppStore } from "@/store/useAppStore";
+import { cn } from "@/utils/cn";
+
+const navItems = [
+  { to: "/", label: "Acasă", icon: LayoutDashboard },
+  { to: "/booking", label: "Curse", icon: Car },
+  { to: "/roadside", label: "Roadside", icon: Wrench },
+  { to: "/profile", label: "Profil", icon: UserRound }
+];
+
+export function AppShell() {
+  const navigate = useNavigate();
+  const online = useOnlineStatus();
+  const { theme, setTheme } = useTheme();
+  const profile = useAppStore((state) => state.profile);
+  const notifications = useAppStore((state) => state.notifications);
+  const unreadCount = notifications.filter((notification) => !notification.read).length;
+  useRealtimeNotifications();
+
+  const cycleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : theme === "light" ? "system" : "dark";
+    void setTheme(nextTheme);
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-30 border-b bg-background/92 backdrop-blur">
+        <div className="container flex h-16 items-center justify-between gap-3">
+          <button
+            type="button"
+            className="flex items-center gap-3 text-left"
+            onClick={() => navigate("/")}
+            aria-label="Mergi la dashboard"
+          >
+            <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary text-base font-black text-primary-foreground">
+              R
+            </span>
+            <span className="hidden min-[360px]:block">
+              <span className="block text-sm font-semibold">Rider</span>
+              <span className="block text-xs text-muted-foreground">
+                {profile?.fullName ? `Salut, ${profile.fullName.split(" ")[0]}` : "Mobilitate + Roadside"}
+              </span>
+            </span>
+          </button>
+
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Navigare principală">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  cn(
+                    "inline-flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                    isActive && "bg-secondary text-foreground"
+                  )
+                }
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            {!online && <Badge variant="warning">Offline</Badge>}
+            <Button variant="ghost" size="icon" onClick={() => navigate("/operator")} title="Dispecerat" aria-label="Dispecerat">
+              <Headphones className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={cycleTheme} title="Schimbă tema" aria-label="Schimbă tema">
+              {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/profile")} title="Notificări" aria-label="Notificări">
+              <span className="relative">
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -right-2 -top-2 h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true" />
+                )}
+              </span>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="container pb-24 pt-5 md:pb-8">
+        <Outlet />
+      </main>
+
+      <nav
+        className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-3 py-2 backdrop-blur md:hidden"
+        aria-label="Navigare mobilă"
+      >
+        <div className="mx-auto grid max-w-md grid-cols-4 gap-1">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                cn(
+                  "flex h-14 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-semibold text-muted-foreground",
+                  isActive && "bg-secondary text-foreground"
+                )
+              }
+            >
+              <item.icon className="h-5 w-5" />
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
+    </div>
+  );
+}
