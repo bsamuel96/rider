@@ -11,5 +11,5 @@ const driverNavItems: RoleNavItem[] = [
 ];
 
 export function DriverShell() {
-  return <RoleShellFrame portalLabel="Rider Șofer" homePath="/driver" navItems={driverNavItems} />;
+  return <RoleShellFrame portalLabel="Rider Șofer" homePath="/driver" navItems={driverNavItems} mapFirst />;
 }

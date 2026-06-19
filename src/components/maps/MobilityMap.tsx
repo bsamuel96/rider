@@ -1,6 +1,7 @@
-import { divIcon, type LatLngExpression, type LatLngTuple } from "leaflet";
+import { type LatLngExpression, type LatLngTuple } from "leaflet";
 import { useEffect } from "react";
-import { MapContainer, Marker, Polyline, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
+import { MapActorMarker } from "@/components/maps/MapActorMarker";
 import type { Coordinates } from "@/types/domain";
 import { DEFAULT_CENTER, TILE_URL } from "@/utils/constants";
 
@@ -10,19 +11,6 @@ type MobilityMapProps = {
   driver?: Coordinates;
   fullscreen?: boolean;
 };
-
-function createPin(className: string) {
-  return divIcon({
-    className: "",
-    html: `<span class="map-pin ${className}"></span>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14]
-  });
-}
-
-const pickupIcon = createPin("map-pin-pickup");
-const destinationIcon = createPin("map-pin-destination");
-const driverIcon = createPin("map-pin-driver");
 
 function MapBounds({ points }: { points: LatLngTuple[] }) {
   const map = useMap();
@@ -53,16 +41,16 @@ export function MobilityMap({ pickup, destination, driver, fullscreen = false }:
   const center: LatLngExpression = pickup ? [pickup.lat, pickup.lng] : [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng];
 
   return (
-    <div className={fullscreen ? "h-[calc(100vh-4rem)] overflow-hidden rounded-lg" : "h-72 overflow-hidden rounded-lg"}>
+    <div className={fullscreen ? "h-[calc(100vh-4rem)] overflow-hidden rounded-2xl" : "h-72 overflow-hidden rounded-2xl shadow-map-control"}>
       <MapContainer center={center} zoom={13} scrollWheelZoom className="h-full w-full">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url={TILE_URL}
         />
         <MapBounds points={points} />
-        {pickup && <Marker position={[pickup.lat, pickup.lng]} icon={pickupIcon} />}
-        {destination && <Marker position={[destination.lat, destination.lng]} icon={destinationIcon} />}
-        {driver && <Marker position={[driver.lat, driver.lng]} icon={driverIcon} />}
+        <MapActorMarker type="pickup" position={pickup} label="Pickup" />
+        <MapActorMarker type="destination" position={destination} label="Destinație" />
+        <MapActorMarker type="driver" position={driver} label="Șofer" etaLabel="~6 min" heading={25} />
         {route.length === 2 && (
           <Polyline positions={route} pathOptions={{ color: "#14b8a6", weight: 5, opacity: 0.78, dashArray: "8 10" }} />
         )}

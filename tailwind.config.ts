@@ -49,7 +49,9 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)"
       },
       boxShadow: {
-        soft: "0 20px 50px -28px rgb(15 23 42 / 0.35)"
+        soft: "0 20px 50px -28px rgb(15 23 42 / 0.35)",
+        floating: "0 24px 70px -32px rgb(15 23 42 / 0.55)",
+        "map-control": "0 18px 42px -26px rgb(15 23 42 / 0.5)"
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],

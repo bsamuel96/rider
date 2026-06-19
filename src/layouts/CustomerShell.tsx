@@ -11,5 +11,5 @@ const customerNavItems: RoleNavItem[] = [
 ];
 
 export function CustomerShell() {
-  return <RoleShellFrame portalLabel="Rider Client" homePath="/customer" navItems={customerNavItems} />;
+  return <RoleShellFrame portalLabel="Rider Client" homePath="/customer" navItems={customerNavItems} mapFirst />;
 }

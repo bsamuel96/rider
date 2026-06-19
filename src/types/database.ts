@@ -147,6 +147,9 @@ export type Database = {
           service_type: string;
           status: string;
           price: number;
+          payment_method: string;
+          cash_status: string;
+          currency: string;
           created_at: string;
         };
         Insert: {
@@ -162,9 +165,114 @@ export type Database = {
           service_type: string;
           status?: string;
           price: number;
+          payment_method?: string;
+          cash_status?: string;
+          currency?: string;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["bookings"]["Insert"]>;
+        Relationships: [];
+      };
+      roadside_requests: {
+        Row: {
+          id: string;
+          user_id: string;
+          operator_id: string | null;
+          issue_type: string;
+          description: string | null;
+          status: string;
+          lat: number;
+          lng: number;
+          payment_method: string;
+          cash_status: string;
+          currency: string;
+          estimated_price: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          operator_id?: string | null;
+          issue_type: string;
+          description?: string | null;
+          status?: string;
+          lat: number;
+          lng: number;
+          payment_method?: string;
+          cash_status?: string;
+          currency?: string;
+          estimated_price?: number;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["roadside_requests"]["Insert"]>;
+        Relationships: [];
+      };
+      driver_locations: {
+        Row: {
+          id: string;
+          driver_id: string;
+          lat: number;
+          lng: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          driver_id: string;
+          lat: number;
+          lng: number;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["driver_locations"]["Insert"]>;
+        Relationships: [];
+      };
+      roadside_operator_locations: {
+        Row: {
+          id: string;
+          operator_id: string;
+          lat: number;
+          lng: number;
+          heading: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          operator_id: string;
+          lat: number;
+          lng: number;
+          heading?: number;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["roadside_operator_locations"]["Insert"]>;
+        Relationships: [];
+      };
+      ratings: {
+        Row: {
+          id: string;
+          booking_id: string | null;
+          roadside_request_id: string | null;
+          rater_id: string;
+          ratee_id: string;
+          rater_role: string;
+          ratee_role: string;
+          rating: number;
+          tags: string[];
+          comment: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          booking_id?: string | null;
+          roadside_request_id?: string | null;
+          rater_id: string;
+          ratee_id: string;
+          rater_role: string;
+          ratee_role: string;
+          rating: number;
+          tags?: string[];
+          comment?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["ratings"]["Insert"]>;
         Relationships: [];
       };
       notifications: {

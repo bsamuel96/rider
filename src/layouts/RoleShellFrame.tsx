@@ -1,11 +1,11 @@
 import type { LucideIcon } from "lucide-react";
-import { Bell, LogOut, Moon, Sun } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { CarHeadlightThemeToggle } from "@/components/theme/CarHeadlightThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
-import { useTheme } from "@/hooks/useTheme";
 import { useAppStore } from "@/store/useAppStore";
 import { cn } from "@/utils/cn";
 
@@ -20,22 +20,23 @@ type RoleShellFrameProps = {
   homePath: string;
   profilePath?: string;
   navItems: RoleNavItem[];
+  mapFirst?: boolean;
 };
 
-export function RoleShellFrame({ portalLabel, homePath, profilePath = `${homePath}/profile`, navItems }: RoleShellFrameProps) {
+export function RoleShellFrame({
+  portalLabel,
+  homePath,
+  profilePath = `${homePath}/profile`,
+  navItems,
+  mapFirst = false
+}: RoleShellFrameProps) {
   const navigate = useNavigate();
   const online = useOnlineStatus();
-  const { theme, setTheme } = useTheme();
   const profile = useAppStore((state) => state.profile);
   const notifications = useAppStore((state) => state.notifications);
   const logout = useAppStore((state) => state.logout);
   const unreadCount = notifications.filter((notification) => !notification.read).length;
   useRealtimeNotifications();
-
-  const cycleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : theme === "light" ? "system" : "dark";
-    void setTheme(nextTheme);
-  };
 
   const exit = async () => {
     await logout();
@@ -44,7 +45,12 @@ export function RoleShellFrame({ portalLabel, homePath, profilePath = `${homePat
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-30 border-b bg-background/92 backdrop-blur">
+      <header
+        className={cn(
+          "sticky top-0 z-30 border-b bg-background/92 backdrop-blur",
+          mapFirst && "hidden border-border/50 bg-background/80 lg:block"
+        )}
+      >
         <div className="container flex h-16 items-center justify-between gap-3">
           <button type="button" className="flex items-center gap-3 text-left" onClick={() => navigate(homePath)}>
             <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary text-base font-black text-primary-foreground">
@@ -79,9 +85,7 @@ export function RoleShellFrame({ portalLabel, homePath, profilePath = `${homePat
 
           <div className="flex items-center gap-2">
             {!online && <Badge variant="warning">Offline</Badge>}
-            <Button variant="ghost" size="icon" onClick={cycleTheme} aria-label="Schimbă tema">
-              {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            </Button>
+            <CarHeadlightThemeToggle />
             <Button variant="ghost" size="icon" onClick={() => navigate(profilePath)} aria-label="Notificări">
               <span className="relative">
                 <Bell className="h-4 w-4" />
@@ -97,7 +101,7 @@ export function RoleShellFrame({ portalLabel, homePath, profilePath = `${homePat
         </div>
       </header>
 
-      <main className="container pb-24 pt-5 lg:pb-8">
+      <main className={cn(mapFirst ? "pb-0 pt-0" : "container pb-24 pt-5 lg:pb-8")}>
         <Outlet />
       </main>
 

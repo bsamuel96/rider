@@ -8,6 +8,10 @@ export type ThemePreference = "light" | "dark" | "system";
 
 export type ServiceType = "standard" | "premium" | "tow" | "roadside";
 
+export type PaymentMethod = "cash" | "card";
+
+export type CashStatus = "not_required" | "pending_collection" | "collected" | "disputed";
+
 export type BookingStatus =
   | "searching"
   | "confirmed"
@@ -120,6 +124,28 @@ export type BookingDraft = {
   distanceKm?: number;
   durationMinutes?: number;
   price?: number;
+  paymentMethod?: PaymentMethod;
+  cashRequired?: boolean;
+  cashStatus?: CashStatus;
+  fareEstimate?: number;
+  currency?: "RON";
+};
+
+export type RatingTag =
+  | "Curat"
+  | "Politicos"
+  | "Rapid"
+  | "Confortabil"
+  | "Sigur"
+  | "Profesionist"
+  | "Echipat"
+  | "Clar"
+  | "Recomand";
+
+export type RatingDraft = {
+  value: number;
+  tags: RatingTag[];
+  comment?: string;
 };
 
 export type NotificationItem = {

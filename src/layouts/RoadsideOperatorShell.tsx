@@ -12,5 +12,5 @@ const roadsideNavItems: RoleNavItem[] = [
 ];
 
 export function RoadsideOperatorShell() {
-  return <RoleShellFrame portalLabel="Rider Roadside" homePath="/roadside-operator" navItems={roadsideNavItems} />;
+  return <RoleShellFrame portalLabel="Rider Roadside" homePath="/roadside-operator" navItems={roadsideNavItems} mapFirst />;
 }
