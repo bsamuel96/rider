@@ -20,6 +20,12 @@ export default tseslint.config(
     }
   },
   {
+    files: ["supabase/functions/**/*.ts"],
+    rules: {
+      "@typescript-eslint/triple-slash-reference": "off"
+    }
+  },
+  {
     files: ["src/**/*.{ts,tsx}"],
     plugins: {
       "react-hooks": reactHooks,

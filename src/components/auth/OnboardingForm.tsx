@@ -46,6 +46,8 @@ export function OnboardingForm() {
       username: profile?.username,
       fullName: values.fullName,
       role: profile?.role || "client",
+      activeInstance: profile?.activeInstance || "customer",
+      registrationStatus: profile?.registrationStatus || "active",
       theme: profile?.theme || "system"
     };
 
@@ -58,6 +60,8 @@ export function OnboardingForm() {
         phone: nextProfile.phone,
         full_name: nextProfile.fullName,
         role: nextProfile.role,
+        active_instance: nextProfile.activeInstance,
+        registration_status: nextProfile.registrationStatus,
         theme: nextProfile.theme
       });
 
@@ -80,7 +84,7 @@ export function OnboardingForm() {
       );
     }
 
-    navigate("/");
+    navigate("/customer");
   };
 
   return (

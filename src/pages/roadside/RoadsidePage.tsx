@@ -20,7 +20,7 @@ export function RoadsidePage() {
       read: false,
       createdAt: new Date().toISOString()
     });
-    navigate("/tracking");
+    navigate("/customer/tracking/roadside-demo");
   };
 
   return (

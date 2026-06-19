@@ -9,10 +9,10 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { useAppStore } from "@/store/useAppStore";
 
 const quickActions = [
-  { label: "Standard", icon: Car, path: "/booking" },
-  { label: "Premium", icon: Sparkles, path: "/booking" },
-  { label: "Tractare", icon: Truck, path: "/roadside" },
-  { label: "Asistență", icon: Wrench, path: "/roadside" }
+  { label: "Standard", icon: Car, path: "/customer/booking" },
+  { label: "Premium", icon: Sparkles, path: "/customer/booking" },
+  { label: "Tractare", icon: Truck, path: "/customer/roadside" },
+  { label: "Asistență", icon: Wrench, path: "/customer/roadside" }
 ];
 
 export function DashboardPage() {
@@ -51,7 +51,7 @@ export function DashboardPage() {
 
             <button
               type="button"
-              onClick={() => navigate("/booking")}
+              onClick={() => navigate("/customer/booking")}
               className="flex min-h-24 w-full items-center justify-between gap-4 rounded-lg border bg-background p-4 text-left transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span>
@@ -90,7 +90,7 @@ export function DashboardPage() {
             <div>
               <h2 className="font-semibold">Roadside rapid</h2>
               <p className="mt-1 text-sm text-muted-foreground">Pentru pană, baterie, accident sau combustibil, operatorul vede poziția ta în timp real.</p>
-              <Button className="mt-4" variant="outline" onClick={() => navigate("/roadside")}>
+              <Button className="mt-4" variant="outline" onClick={() => navigate("/customer/roadside")}>
                 <MapPin className="h-4 w-4" />
                 Solicită ajutor
               </Button>

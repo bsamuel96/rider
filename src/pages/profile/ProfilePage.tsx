@@ -2,6 +2,7 @@ import { CreditCard, Heart, Home, Mail, MapPin, Phone, UserRound } from "lucide-
 import { ThemePreference } from "@/components/profile/ThemePreference";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { ROLE_LABELS } from "@/services/roleRedirect";
 import { useAppStore } from "@/store/useAppStore";
 
 export function ProfilePage() {
@@ -17,7 +18,10 @@ export function ProfilePage() {
           </span>
           <div>
             <h1 className="text-lg font-semibold">{profile?.fullName || "Client Rider"}</h1>
-            <Badge variant="secondary">{profile?.role || "client"}</Badge>
+            <div className="mt-1 flex flex-wrap gap-2">
+              <Badge variant="secondary">{profile ? ROLE_LABELS[profile.role] : "Client"}</Badge>
+              {profile?.registrationStatus && <Badge variant="outline">{profile.registrationStatus}</Badge>}
+            </div>
           </div>
         </div>
 

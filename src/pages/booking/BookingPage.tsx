@@ -36,7 +36,7 @@ export function BookingPage() {
       read: false,
       createdAt: new Date().toISOString()
     });
-    navigate("/tracking");
+    navigate("/customer/tracking/demo");
   };
 
   return (
