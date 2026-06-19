@@ -118,8 +118,13 @@ export function LiveMobilityMap({
   const statusLabel = getStatusLabel(status);
 
   return (
-    <div className={cn("relative h-full min-h-[calc(100svh-4rem)] overflow-hidden bg-muted", className)}>
-      <MapContainer center={center} zoom={13} scrollWheelZoom className="h-full w-full">
+    <div
+      className={cn(
+        "relative h-[100svh] min-h-[520px] overflow-hidden bg-muted lg:h-[calc(100vh-4rem)]",
+        className
+      )}
+    >
+      <MapContainer center={center} zoom={13} scrollWheelZoom className="absolute inset-0 z-0 h-full w-full">
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url={TILE_URL}

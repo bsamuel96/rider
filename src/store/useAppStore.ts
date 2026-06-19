@@ -4,6 +4,31 @@ import { isSupabaseConfigured, supabase } from "@/services/supabase";
 import type { AuthInstance, BookingDraft, NotificationItem, Profile, ThemePreference } from "@/types/domain";
 
 type AuthStatus = "anonymous" | "authenticated";
+const DEMO_PROFILE_STORAGE_KEY = "rider-demo-profile";
+
+function readStoredDemoProfile() {
+  try {
+    const rawProfile = localStorage.getItem(DEMO_PROFILE_STORAGE_KEY);
+    if (!rawProfile) {
+      return null;
+    }
+
+    const profile = JSON.parse(rawProfile) as Profile;
+    return profile.id.startsWith("demo-") ? profile : null;
+  } catch {
+    localStorage.removeItem(DEMO_PROFILE_STORAGE_KEY);
+    return null;
+  }
+}
+
+function persistDemoProfile(profile: Profile | null) {
+  if (profile?.id.startsWith("demo-")) {
+    localStorage.setItem(DEMO_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+    return;
+  }
+
+  localStorage.removeItem(DEMO_PROFILE_STORAGE_KEY);
+}
 
 type AppState = {
   profile: Profile | null;
@@ -47,10 +72,14 @@ export const useAppStore = create<AppState>((set) => ({
     }
   ],
   setProfile: (profile) =>
-    set({
-      profile,
-      authStatus: profile ? "authenticated" : "anonymous",
-      activeInstance: profile?.activeInstance || persistedInstance
+    set(() => {
+      persistDemoProfile(profile);
+
+      return {
+        profile,
+        authStatus: profile ? "authenticated" : "anonymous",
+        activeInstance: profile?.activeInstance || persistedInstance
+      };
     }),
   setActiveInstance: (activeInstance) => {
     localStorage.setItem("rider-last-auth-instance", activeInstance);
@@ -61,16 +90,27 @@ export const useAppStore = create<AppState>((set) => ({
   hydrateSession: async () => {
     set({ sessionLoading: true });
 
+    const demoProfile = readStoredDemoProfile();
+
     if (!isSupabaseConfigured) {
-      set({ sessionLoading: false, authStatus: "anonymous" });
+      set({
+        profile: demoProfile,
+        activeInstance: demoProfile?.activeInstance || persistedInstance,
+        sessionLoading: false,
+        authStatus: demoProfile ? "authenticated" : "anonymous"
+      });
       return;
     }
 
     const profile = await getCurrentProfile();
+    if (profile) {
+      persistDemoProfile(null);
+    }
+
     set({
-      profile,
-      activeInstance: profile?.activeInstance || persistedInstance,
-      authStatus: profile ? "authenticated" : "anonymous",
+      profile: profile || demoProfile,
+      activeInstance: profile?.activeInstance || demoProfile?.activeInstance || persistedInstance,
+      authStatus: profile || demoProfile ? "authenticated" : "anonymous",
       sessionLoading: false
     });
   },
@@ -79,6 +119,7 @@ export const useAppStore = create<AppState>((set) => ({
       await supabase.auth.signOut();
     }
 
+    persistDemoProfile(null);
     set({ profile: null, authStatus: "anonymous" });
   },
   updateProfile: (profile) =>
