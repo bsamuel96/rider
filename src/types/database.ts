@@ -693,6 +693,160 @@ export type Database = {
         Update: Partial<Database["public"]["Tables"]["login_audit_events"]["Insert"]>;
         Relationships: [];
       };
+      chat_threads: {
+        Row: {
+          id: string;
+          booking_id: string | null;
+          roadside_request_id: string | null;
+          support_ticket_id: string | null;
+          thread_type: string;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          booking_id?: string | null;
+          roadside_request_id?: string | null;
+          support_ticket_id?: string | null;
+          thread_type: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["chat_threads"]["Insert"]>;
+        Relationships: [];
+      };
+      chat_participants: {
+        Row: {
+          id: string;
+          thread_id: string;
+          user_id: string;
+          participant_role: string;
+          last_read_at: string | null;
+          muted: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          thread_id: string;
+          user_id: string;
+          participant_role: string;
+          last_read_at?: string | null;
+          muted?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["chat_participants"]["Insert"]>;
+        Relationships: [];
+      };
+      chat_messages: {
+        Row: {
+          id: string;
+          thread_id: string;
+          sender_id: string | null;
+          message_type: string;
+          body: string | null;
+          metadata: Json;
+          attachment_url: string | null;
+          created_at: string;
+          edited_at: string | null;
+          deleted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          thread_id: string;
+          sender_id?: string | null;
+          message_type?: string;
+          body?: string | null;
+          metadata?: Json;
+          attachment_url?: string | null;
+          created_at?: string;
+          edited_at?: string | null;
+          deleted_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["chat_messages"]["Insert"]>;
+        Relationships: [];
+      };
+      support_tickets: {
+        Row: {
+          id: string;
+          created_by: string;
+          assigned_to: string | null;
+          related_booking_id: string | null;
+          related_roadside_request_id: string | null;
+          related_vehicle_id: string | null;
+          category: string;
+          priority: string;
+          status: string;
+          subject: string;
+          description: string;
+          contact_preference: string;
+          metadata: Json;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          created_by: string;
+          assigned_to?: string | null;
+          related_booking_id?: string | null;
+          related_roadside_request_id?: string | null;
+          related_vehicle_id?: string | null;
+          category: string;
+          priority?: string;
+          status?: string;
+          subject: string;
+          description: string;
+          contact_preference?: string;
+          metadata?: Json;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["support_tickets"]["Insert"]>;
+        Relationships: [];
+      };
+      support_messages: {
+        Row: {
+          id: string;
+          ticket_id: string;
+          sender_id: string | null;
+          body: string;
+          attachment_url: string | null;
+          internal_note: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          ticket_id: string;
+          sender_id?: string | null;
+          body: string;
+          attachment_url?: string | null;
+          internal_note?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["support_messages"]["Insert"]>;
+        Relationships: [];
+      };
+      support_events: {
+        Row: {
+          id: string;
+          ticket_id: string;
+          actor_id: string | null;
+          event_type: string;
+          payload: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          ticket_id: string;
+          actor_id?: string | null;
+          event_type: string;
+          payload?: Json;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["support_events"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

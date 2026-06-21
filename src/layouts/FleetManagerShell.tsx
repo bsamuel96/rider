@@ -1,10 +1,11 @@
-import { AlertTriangle, Car, Home, Truck, UserRound } from "lucide-react";
+import { AlertTriangle, Car, Home, LifeBuoy, Truck, UserRound } from "lucide-react";
 import { RoleShellFrame, type RoleNavItem } from "@/layouts/RoleShellFrame";
 
 const fleetManagerNavItems: RoleNavItem[] = [
   { to: "/fleet-manager", label: "Home", icon: Home },
   { to: "/fleet-manager/transport", label: "Transport", icon: Car },
   { to: "/fleet-manager/roadside", label: "Roadside", icon: Truck },
+  { to: "/fleet-manager/support", label: "Suport", icon: LifeBuoy },
   { to: "/fleet-manager/profile", label: "Profil", icon: UserRound }
 ];
 

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Car, Truck } from "lucide-react";
+import { ArrowRight, Car, LifeBuoy, Truck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AppSplashScreen } from "@/components/splash/AppSplashScreen";
@@ -57,10 +57,20 @@ export function FleetManagerHomePage() {
       </div>
 
       <Card className="rounded-3xl p-4">
-        <p className="text-sm font-semibold">Global overview</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Folosește această pagină doar ca selector. Dashboardurile complete sunt separate în Transport și Roadside.
-        </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold">Global overview</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Folosește această pagină doar ca selector. Dashboardurile complete sunt separate în Transport și Roadside.
+            </p>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/fleet-manager/support">
+              <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+              Suport fleet
+            </Link>
+          </Button>
+        </div>
       </Card>
     </div>
   );

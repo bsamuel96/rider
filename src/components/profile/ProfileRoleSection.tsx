@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
-import { Building2, Car, FileCheck2, ShieldCheck, Truck, UserCog } from "lucide-react";
+import { Building2, Car, FileCheck2, LifeBuoy, ShieldCheck, Truck, UserCog } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Profile } from "@/types/domain";
+import { getSupportBasePath } from "@/utils/communicationRoutes";
 
 type ProfileRoleSectionProps = {
   profile: Profile;
@@ -23,6 +24,7 @@ export function ProfileRoleSection({ profile }: ProfileRoleSectionProps) {
             <Link to="/driver/documents">Vezi documente</Link>
           </Button>
         </RoleTile>
+        <SupportRoleTile profile={profile} />
       </div>
     );
   }
@@ -40,17 +42,21 @@ export function ProfileRoleSection({ profile }: ProfileRoleSectionProps) {
             Operator verificare
           </Badge>
         </RoleTile>
+        <SupportRoleTile profile={profile} />
       </div>
     );
   }
 
   if (profile.role === "admin") {
     return (
-      <RoleTile icon={UserCog} title="Administrator" body="Rol operațional cu acces la control și aprobări.">
-        <Badge variant="secondary" className="mt-3">
-          Read-only role badge
-        </Badge>
-      </RoleTile>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <RoleTile icon={UserCog} title="Administrator" body="Rol operațional cu acces la control și aprobări.">
+          <Badge variant="secondary" className="mt-3">
+            Read-only role badge
+          </Badge>
+        </RoleTile>
+        <SupportRoleTile profile={profile} />
+      </div>
     );
   }
 
@@ -67,16 +73,20 @@ export function ProfileRoleSection({ profile }: ProfileRoleSectionProps) {
             SLA activ
           </Badge>
         </RoleTile>
+        <SupportRoleTile profile={profile} />
       </div>
     );
   }
 
   return (
-    <RoleTile icon={ShieldCheck} title="Client Rider" body="Adrese, plată preferată și locații favorite.">
-      <Badge variant="secondary" className="mt-3">
-        Client activ
-      </Badge>
-    </RoleTile>
+    <div className="grid gap-3 sm:grid-cols-2">
+      <RoleTile icon={ShieldCheck} title="Client Rider" body="Adrese, plată preferată și locații favorite.">
+        <Badge variant="secondary" className="mt-3">
+          Client activ
+        </Badge>
+      </RoleTile>
+      <SupportRoleTile profile={profile} />
+    </div>
   );
 }
 
@@ -97,5 +107,15 @@ function RoleTile({ icon: Icon, title, body, children }: RoleTileProps) {
       <p className="mt-1 text-sm text-muted-foreground">{body}</p>
       {children}
     </div>
+  );
+}
+
+function SupportRoleTile({ profile }: { profile: Profile }) {
+  return (
+    <RoleTile icon={LifeBuoy} title="Suport" body="Vezi tichetele tale sau cere ajutor pentru curse, plăți, documente ori aplicație.">
+      <Button asChild variant="outline" className="mt-3 w-full">
+        <Link to={getSupportBasePath(profile)}>Deschide suport</Link>
+      </Button>
+    </RoleTile>
   );
 }

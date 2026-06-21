@@ -396,3 +396,121 @@ export type NotificationItem = {
   read: boolean;
   createdAt: string;
 };
+
+export type ChatMessageType = "text" | "image" | "location" | "system" | "quick_reply";
+
+export type ChatThreadType = "ride" | "roadside" | "support";
+
+export type ChatThreadStatus = "open" | "closed" | "archived";
+
+export type ChatParticipantRole = UserRole | "support_agent" | "system";
+
+export type ChatParticipant = {
+  id: string;
+  threadId: string;
+  userId: string;
+  name: string;
+  role: ChatParticipantRole;
+  lastReadAt?: string;
+  muted?: boolean;
+};
+
+export type ChatThread = {
+  id: string;
+  threadType: ChatThreadType;
+  status: ChatThreadStatus;
+  title: string;
+  subtitle?: string;
+  bookingId?: string;
+  roadsideRequestId?: string;
+  supportTicketId?: string;
+  participants: ChatParticipant[];
+  unreadCount?: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ChatMessage = {
+  id: string;
+  threadId: string;
+  senderId?: string;
+  senderName: string;
+  senderRole: ChatParticipantRole;
+  messageType: ChatMessageType;
+  body?: string;
+  metadata?: Record<string, unknown>;
+  attachmentUrl?: string;
+  createdAt: string;
+  deliveredAt?: string;
+  readAt?: string;
+};
+
+export type SupportTicketStatus =
+  | "open"
+  | "waiting_for_support"
+  | "waiting_for_user"
+  | "in_review"
+  | "resolved"
+  | "closed"
+  | "escalated";
+
+export type SupportTicketPriority = "low" | "normal" | "high" | "urgent";
+
+export type SupportTicketCategory =
+  | "ride"
+  | "roadside"
+  | "payment"
+  | "cash"
+  | "safety"
+  | "driver"
+  | "customer"
+  | "vehicle"
+  | "documents"
+  | "fleet"
+  | "app"
+  | "account"
+  | "other";
+
+export type SupportContactPreference = "in_app" | "phone" | "email";
+
+export type SupportTicket = {
+  id: string;
+  createdBy: string;
+  createdByName: string;
+  createdByRole: UserRole;
+  assignedTo?: string;
+  assignedToName?: string;
+  relatedBookingId?: string;
+  relatedRoadsideRequestId?: string;
+  relatedVehicleId?: string;
+  category: SupportTicketCategory;
+  priority: SupportTicketPriority;
+  status: SupportTicketStatus;
+  subject: string;
+  description: string;
+  contactPreference: SupportContactPreference;
+  unreadCount?: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type SupportMessage = {
+  id: string;
+  ticketId: string;
+  senderId?: string;
+  senderName: string;
+  senderRole: UserRole | "support_agent" | "system";
+  body: string;
+  attachmentUrl?: string;
+  internalNote?: boolean;
+  createdAt: string;
+};
+
+export type SupportEvent = {
+  id: string;
+  ticketId: string;
+  actorId?: string;
+  eventType: string;
+  payload?: Record<string, unknown>;
+  createdAt: string;
+};

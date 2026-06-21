@@ -1,4 +1,5 @@
-import { CheckCircle2, Wrench } from "lucide-react";
+import { CheckCircle2, LifeBuoy, Wrench } from "lucide-react";
+import { Link } from "react-router-dom";
 import { FleetSectionNav } from "@/components/fleet/FleetSectionNav";
 import { TransportAlertsPanel } from "@/components/fleet/transport/TransportAlertsPanel";
 import { TransportDriverAvailability } from "@/components/fleet/transport/TransportDriverAvailability";
@@ -77,6 +78,12 @@ export function TransportFleetDashboardPage() {
               >
                 <Wrench className="h-4 w-4" aria-hidden="true" />
                 Mark maintenance
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/fleet-manager/support/new">
+                  <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+                  Support ticket
+                </Link>
               </Button>
             </div>
           </Card>

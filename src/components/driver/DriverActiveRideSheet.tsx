@@ -1,4 +1,5 @@
-import { Banknote, Clock, MapPin, Phone, Route, XCircle } from "lucide-react";
+import { Banknote, Clock, LifeBuoy, MapPin, MessageCircle, Phone, Route, XCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
 import { NavigateToCustomerButton } from "@/components/navigation/NavigateToCustomerButton";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ export function DriverActiveRideSheet({
   onCancelRide
 }: DriverActiveRideSheetProps) {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const navigatesToDestination = ["trip_started", "en_route_to_destination", "arrived_at_destination"].includes(status);
   const navigationCoordinates = navigatesToDestination ? booking.destination : booking.pickup;
   const navigationLabel = navigatesToDestination ? booking.destinationAddress : booking.pickupAddress;
@@ -75,7 +77,11 @@ export function DriverActiveRideSheet({
         </div>
       </div>
 
-      <div className="grid grid-cols-[1fr_1.5fr] gap-2">
+      <div className="grid grid-cols-3 gap-2">
+        <Button type="button" variant="outline" onClick={() => navigate(`/driver/chat/ride-${booking.bookingId}`)}>
+          <MessageCircle className="h-4 w-4" aria-hidden="true" />
+          Mesaj
+        </Button>
         <Button
           type="button"
           variant="outline"
@@ -90,7 +96,13 @@ export function DriverActiveRideSheet({
           <Phone className="h-4 w-4" aria-hidden="true" />
           Sună
         </Button>
-        <Button type="button" onClick={onPrimaryAction} disabled={!primaryAction}>
+        <Button type="button" variant="outline" onClick={() => navigate("/driver/support/new")}>
+          <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+          Suport
+        </Button>
+      </div>
+      <div>
+        <Button type="button" onClick={onPrimaryAction} disabled={!primaryAction} className="w-full">
           {primaryAction?.label ?? "Continuă"}
         </Button>
       </div>

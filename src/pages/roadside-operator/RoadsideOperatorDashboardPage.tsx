@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Banknote, CheckCircle2, Headphones, Phone, RadioTower, Star, Truck, Wrench } from "lucide-react";
+import { Banknote, CheckCircle2, Headphones, LifeBuoy, MessageCircle, Phone, RadioTower, Star, Truck, Wrench } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
 import { MapFloatingButton } from "@/components/maps/MapFloatingButton";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
@@ -18,6 +19,7 @@ import { estimateEtaMinutes, haversineDistanceKm } from "@/utils/geo";
 
 export function RoadsideOperatorDashboardPage() {
   const { position } = useGeolocation();
+  const navigate = useNavigate();
   const showSplash = useRoleSplash("roadside");
   const { toast } = useToast();
   const [online, setOnline] = useState(true);
@@ -146,9 +148,21 @@ export function RoadsideOperatorDashboardPage() {
                 <p className="text-xs text-muted-foreground">Client la ~{etaToClientMinutes} min · cash 180 RON</p>
               </div>
             </div>
-            <MapFloatingButton aria-label="Sună clientul" title="Sună clientul" onClick={contactCustomer}>
-              <Phone className="h-4 w-4" aria-hidden="true" />
-            </MapFloatingButton>
+            <div className="flex gap-2">
+              <MapFloatingButton
+                aria-label="Mesaj client"
+                title="Mesaj client"
+                onClick={() => navigate("/roadside-operator/chat/roadside-demo-roadside-active")}
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              </MapFloatingButton>
+              <MapFloatingButton aria-label="Sună clientul" title="Sună clientul" onClick={contactCustomer}>
+                <Phone className="h-4 w-4" aria-hidden="true" />
+              </MapFloatingButton>
+              <MapFloatingButton aria-label="Contactează suportul" title="Contactează suportul" onClick={() => navigate("/roadside-operator/support/new")}>
+                <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+              </MapFloatingButton>
+            </div>
           </div>
           {step >= 1 && (
             <NavigateToCustomerButton
@@ -213,6 +227,16 @@ export function RoadsideOperatorDashboardPage() {
               Navighează la client
             </NavigateToCustomerButton>
           )}
+          <div className="grid grid-cols-2 gap-2">
+            <Button type="button" variant="outline" onClick={() => navigate("/roadside-operator/chat/roadside-demo-roadside-active")}>
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              Mesaj client
+            </Button>
+            <Button type="button" variant="outline" onClick={() => navigate("/roadside-operator/support/new")}>
+              <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+              Suport
+            </Button>
+          </div>
           {requestStatus === "operator_arrived_pending_customer" && (
             <Button type="button" variant="outline" onClick={() => setRequestStatus("operator_arrived_confirmed")}>
               Demo: clientul a confirmat sosirea

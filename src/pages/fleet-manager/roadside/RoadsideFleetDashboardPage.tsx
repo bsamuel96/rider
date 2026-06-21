@@ -1,4 +1,5 @@
-import { AlertTriangle, MessageSquareWarning } from "lucide-react";
+import { AlertTriangle, LifeBuoy, MessageSquareWarning } from "lucide-react";
+import { Link } from "react-router-dom";
 import { FleetSectionNav } from "@/components/fleet/FleetSectionNav";
 import { RoadsideAlertsPanel } from "@/components/fleet/roadside/RoadsideAlertsPanel";
 import { RoadsideConfirmationQueue } from "@/components/fleet/roadside/RoadsideConfirmationQueue";
@@ -95,6 +96,12 @@ export function RoadsideFleetDashboardPage() {
               >
                 <MessageSquareWarning className="h-4 w-4" aria-hidden="true" />
                 Resolve dispute
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/fleet-manager/support/new">
+                  <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+                  Support ticket
+                </Link>
               </Button>
             </div>
           </Card>

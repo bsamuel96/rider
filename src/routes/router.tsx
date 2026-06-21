@@ -1,8 +1,10 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { ChatRedirect } from "@/components/auth/ChatRedirect";
 import { FleetScopeGuard } from "@/components/auth/FleetScopeGuard";
 import { ProfileRedirect } from "@/components/auth/ProfileRedirect";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { RoleBasedRedirect } from "@/components/auth/RoleBasedRedirect";
+import { SupportRedirect } from "@/components/auth/SupportRedirect";
 import { AdminShell } from "@/layouts/AdminShell";
 import { CustomerShell } from "@/layouts/CustomerShell";
 import { DriverShell } from "@/layouts/DriverShell";
@@ -10,11 +12,13 @@ import { FleetManagerShell } from "@/layouts/FleetManagerShell";
 import { RoadsideOperatorShell } from "@/layouts/RoadsideOperatorShell";
 import { AdminApprovalsPage } from "@/pages/admin/AdminApprovalsPage";
 import { AdminPage } from "@/pages/admin/AdminPage";
+import { AdminSupportPage } from "@/pages/admin/AdminSupportPage";
 import { AuthPage } from "@/pages/auth/AuthPage";
 import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage";
 import { OnboardingPage } from "@/pages/auth/OnboardingPage";
 import { BookingPage } from "@/pages/booking/BookingPage";
 import { TrackingPage } from "@/pages/booking/TrackingPage";
+import { ChatPage } from "@/pages/chat/ChatPage";
 import { CustomerAddressesPage } from "@/pages/customer/CustomerAddressesPage";
 import { CustomerHomePage } from "@/pages/customer/CustomerHomePage";
 import { CustomerHistoryPage } from "@/pages/customer/CustomerHistoryPage";
@@ -48,6 +52,9 @@ import { RoadsideFleetPage } from "@/pages/roadside-operator/RoadsideFleetPage";
 import { RoadsideRequestsPage } from "@/pages/roadside-operator/RoadsideRequestsPage";
 import { RoadsideVehiclesPage } from "@/pages/roadside-operator/RoadsideVehiclesPage";
 import { RoadsidePage } from "@/pages/roadside/RoadsidePage";
+import { NewSupportTicketPage } from "@/pages/support/NewSupportTicketPage";
+import { SupportPage } from "@/pages/support/SupportPage";
+import { SupportTicketPage } from "@/pages/support/SupportTicketPage";
 
 export const router = createBrowserRouter([
   {
@@ -91,7 +98,11 @@ export const router = createBrowserRouter([
       { path: "profile", element: <ProfilePage /> },
       { path: "history", element: <CustomerHistoryPage /> },
       { path: "addresses", element: <CustomerAddressesPage /> },
-      { path: "payment-methods", element: <CustomerPaymentMethodsPage /> }
+      { path: "payment-methods", element: <CustomerPaymentMethodsPage /> },
+      { path: "chat/:threadId", element: <ChatPage /> },
+      { path: "support", element: <SupportPage /> },
+      { path: "support/new", element: <NewSupportTicketPage /> },
+      { path: "support/:ticketId", element: <SupportTicketPage /> }
     ]
   },
   {
@@ -109,7 +120,11 @@ export const router = createBrowserRouter([
       { path: "vehicle", element: <DriverVehiclePage /> },
       { path: "documents", element: <DriverDocumentsPage /> },
       { path: "profile", element: <ProfilePage /> },
-      { path: "pending", element: <DriverPendingPage /> }
+      { path: "pending", element: <DriverPendingPage /> },
+      { path: "chat/:threadId", element: <ChatPage /> },
+      { path: "support", element: <SupportPage /> },
+      { path: "support/new", element: <NewSupportTicketPage /> },
+      { path: "support/:ticketId", element: <SupportTicketPage /> }
     ]
   },
   {
@@ -127,7 +142,11 @@ export const router = createBrowserRouter([
       { path: "vehicles", element: <RoadsideVehiclesPage /> },
       { path: "documents", element: <RoadsideDocumentsPage /> },
       { path: "profile", element: <ProfilePage /> },
-      { path: "pending", element: <RoadsideOperatorPendingPage /> }
+      { path: "pending", element: <RoadsideOperatorPendingPage /> },
+      { path: "chat/:threadId", element: <ChatPage /> },
+      { path: "support", element: <SupportPage /> },
+      { path: "support/new", element: <NewSupportTicketPage /> },
+      { path: "support/:ticketId", element: <SupportTicketPage /> }
     ]
   },
   {
@@ -243,7 +262,10 @@ export const router = createBrowserRouter([
           </FleetScopeGuard>
         )
       },
-      { path: "profile", element: <ProfilePage /> }
+      { path: "profile", element: <ProfilePage /> },
+      { path: "support", element: <SupportPage /> },
+      { path: "support/new", element: <NewSupportTicketPage /> },
+      { path: "support/:ticketId", element: <SupportTicketPage /> }
     ]
   },
   {
@@ -262,6 +284,8 @@ export const router = createBrowserRouter([
       { path: "bookings", element: <AdminPage /> },
       { path: "roadside-requests", element: <AdminPage /> },
       { path: "approvals", element: <AdminApprovalsPage /> },
+      { path: "support", element: <AdminSupportPage /> },
+      { path: "support/:ticketId", element: <SupportTicketPage /> },
       { path: "settings", element: <AdminPage /> }
     ]
   },
@@ -271,5 +295,7 @@ export const router = createBrowserRouter([
   { path: "/operator", element: <Navigate to="/roadside-operator" replace /> },
   { path: "/fleet", element: <Navigate to="/fleet-manager" replace /> },
   { path: "/profile", element: <ProfileRedirect /> },
+  { path: "/support", element: <SupportRedirect /> },
+  { path: "/chat", element: <ChatRedirect /> },
   { path: "*", element: <Navigate to="/" replace /> }
 ]);

@@ -141,7 +141,7 @@ export function AuthPage() {
 
         <Card className="mx-auto w-full max-w-5xl p-4 sm:p-5">
           <h2 className="text-base font-semibold sm:text-lg">Intră rapid în demo</h2>
-          <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(11.5rem,1fr))] gap-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
             <Button
               type="button"
               variant="outline"

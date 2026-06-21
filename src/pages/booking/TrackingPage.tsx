@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Banknote, CarFront, CreditCard, Phone, ShieldCheck, Truck } from "lucide-react";
+import { AlertTriangle, Banknote, CarFront, CreditCard, LifeBuoy, MessageCircle, Phone, ShieldCheck, Truck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
 import { MapBottomSheet } from "@/components/maps/MapBottomSheet";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/useToast";
 import { useAppStore } from "@/store/useAppStore";
 import type { BookingStatus, Coordinates, ServiceType } from "@/types/domain";
 import { STATUS_LABELS } from "@/utils/constants";
+import { getChatBasePath, getSupportBasePath } from "@/utils/communicationRoutes";
 import { formatCurrency } from "@/utils/format";
 import { estimateEtaMinutes, formatDistanceKm, haversineDistanceKm } from "@/utils/geo";
 
@@ -31,11 +33,14 @@ const actionByStatus: Record<BookingStatus, string> = {
 
 export function TrackingPage() {
   const draft = useAppStore((state) => state.bookingDraft);
+  const profile = useAppStore((state) => state.profile);
+  const navigate = useNavigate();
   const payment = usePaymentState();
   const { toast } = useToast();
   const [statusIndex, setStatusIndex] = useState(0);
   const serviceType: ServiceType = draft.serviceType || "standard";
   const isRoadsideService = serviceType === "tow" || serviceType === "roadside";
+  const chatThreadId = isRoadsideService ? "roadside-demo-roadside-active" : "ride-demo-booking-active";
   const actors = useLiveActorLocations({
     pickupLocation: draft.pickup,
     destinationLocation: draft.destination,
@@ -133,9 +138,19 @@ export function TrackingPage() {
                 </p>
               </div>
             </div>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
             <button
               type="button"
-              className="grid h-11 w-11 place-items-center rounded-xl border bg-background/70 transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border/60 bg-background/70 px-2 text-xs font-semibold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              onClick={() => navigate(`${getChatBasePath(profile)}/${chatThreadId}`)}
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              Mesaj
+            </button>
+            <button
+              type="button"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border/60 bg-background/70 px-2 text-xs font-semibold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Sună operatorul"
               title="Sună operatorul"
               onClick={() =>
@@ -147,6 +162,15 @@ export function TrackingPage() {
               }
             >
               <Phone className="h-4 w-4" aria-hidden="true" />
+              Sună
+            </button>
+            <button
+              type="button"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border/60 bg-background/70 px-2 text-xs font-semibold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              onClick={() => navigate(`${getSupportBasePath(profile)}/new`)}
+            >
+              <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+              Suport
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
@@ -173,6 +197,13 @@ export function TrackingPage() {
           <button
             type="button"
             className="min-h-12 w-full rounded-xl border border-border/60 bg-background/55 px-4 text-sm font-semibold transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onClick={() =>
+              toast({
+                title: "Anulare demo",
+                description: "Cursa a primit o cerere de anulare în demo.",
+                tone: "warning"
+              })
+            }
           >
             Anulează
           </button>

@@ -1,4 +1,4 @@
-import { BarChart3, Car, ClipboardList, Settings, Shield, Truck, Users } from "lucide-react";
+import { BarChart3, Car, ClipboardList, LifeBuoy, Settings, Shield, Truck, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AppSplashScreen } from "@/components/splash/AppSplashScreen";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ const sections = [
   { label: "Vehicule", value: "512", icon: Truck, to: "/admin/vehicles" },
   { label: "Comenzi", value: "38.1k", icon: ClipboardList, to: "/admin/bookings" },
   { label: "Roadside", value: "1.204", icon: Shield, to: "/admin/roadside-requests" },
+  { label: "Suport", value: "24", icon: LifeBuoy, to: "/admin/support" },
   { label: "Setări", value: "Active", icon: Settings, to: "/admin/settings" }
 ];
 
