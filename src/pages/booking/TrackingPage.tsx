@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, CarFront, Phone, ShieldCheck, Truck } from "lucide-react";
+import { AlertTriangle, Banknote, CarFront, CreditCard, Phone, ShieldCheck, Truck } from "lucide-react";
 import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
+import { MapBottomSheet } from "@/components/maps/MapBottomSheet";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
+import { MapRatingPanel } from "@/components/maps/MapRatingPanel";
 import { MapFirstPage } from "@/layouts/MapFirstPage";
 import { useLiveActorLocations } from "@/hooks/useLiveActorLocations";
 import { usePaymentState } from "@/hooks/usePaymentState";
+import { useStreetRoute } from "@/hooks/useStreetRoute";
 import { useAppStore } from "@/store/useAppStore";
 import type { BookingStatus, Coordinates, ServiceType } from "@/types/domain";
 import { STATUS_LABELS } from "@/utils/constants";
+import { formatCurrency } from "@/utils/format";
 import { estimateEtaMinutes, formatDistanceKm, haversineDistanceKm } from "@/utils/geo";
 
 const statuses: BookingStatus[] = ["searching", "confirmed", "driver_en_route", "arrived", "in_progress", "completed"];
@@ -63,7 +67,15 @@ export function TrackingPage() {
   const activeActor = isRoadsideService ? movingRoadside : movingDriver;
   const distanceToPickupKm = haversineDistanceKm(activeActor, pickup);
   const etaToPickupMinutes = estimateEtaMinutes(distanceToPickupKm, isRoadsideService ? "roadside_to_pickup" : "driver_to_pickup");
+  const trackingRoute = useStreetRoute({
+    from: activeActor,
+    to: pickup,
+    enabled: currentStatus === "driver_en_route" || currentStatus === "confirmed" || currentStatus === "searching"
+  });
+  const displayDistanceToPickupKm = trackingRoute.distanceKm ?? distanceToPickupKm;
+  const displayEtaToPickupMinutes = trackingRoute.durationMinutes ?? etaToPickupMinutes;
   const fareEstimate = draft.fareEstimate || draft.price || (isRoadsideService ? 180 : 42);
+  const PaymentIcon = payment.isCash ? Banknote : CreditCard;
 
   return (
     <MapFirstPage bottomSafeArea={false}>
@@ -77,9 +89,9 @@ export function TrackingPage() {
         destinationLocation={draft.destination}
         driverLocation={isRoadsideService ? actors.driverLocation : movingDriver}
         roadsideLocation={isRoadsideService ? movingRoadside : actors.roadsideLocation}
-        etaToPickupMinutes={etaToPickupMinutes}
+        etaToPickupMinutes={displayEtaToPickupMinutes}
         etaToDestinationMinutes={actors.etaToDestinationMinutes}
-        distanceToPickupKm={distanceToPickupKm}
+        distanceToPickupKm={displayDistanceToPickupKm}
         distanceToDestinationKm={actors.distanceToDestinationKm}
         paymentMethod={payment.paymentMethod}
         cashEnabled={payment.paymentMethod === "cash"}
@@ -88,12 +100,15 @@ export function TrackingPage() {
         primaryActionLabel={actionByStatus[currentStatus]}
         secondaryActionLabel={currentStatus === "completed" ? undefined : "Anulează"}
         completed={currentStatus === "completed"}
-        onCashToggle={payment.togglePaymentMethod}
+        showBottomControls={false}
         className="min-h-[100svh] lg:min-h-[calc(100vh-4rem)]"
       />
 
-      {currentStatus !== "completed" && (
-        <MapFloatingPanel className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+16.5rem)] z-[520] space-y-3 md:left-auto md:right-5 md:w-[360px]">
+      <MapBottomSheet className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-[540] max-h-[min(50svh,430px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:right-5 md:w-[380px]">
+        {currentStatus === "completed" ? (
+          <MapRatingPanel roadside={isRoadsideService} />
+        ) : (
+          <div className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground">
@@ -102,7 +117,7 @@ export function TrackingPage() {
               <div>
                 <p className="text-sm font-semibold">{isRoadsideService ? "Operator Roadside" : "Andrei · B 101 RID"}</p>
                 <p className="text-xs text-muted-foreground">
-                  {STATUS_LABELS[currentStatus]} · {formatDistanceKm(distanceToPickupKm)}
+                  {STATUS_LABELS[currentStatus]} · {formatDistanceKm(displayDistanceToPickupKm)}
                 </p>
               </div>
             </div>
@@ -116,17 +131,35 @@ export function TrackingPage() {
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <span className="rounded-xl bg-muted/70 p-3">
+            <span className="rounded-xl bg-muted/65 p-3">
               ETA
-              <strong className="mt-1 block text-sm">~{etaToPickupMinutes} min</strong>
+              <strong className="mt-1 block text-sm">~{displayEtaToPickupMinutes} min</strong>
             </span>
-            <span className="rounded-xl bg-muted/70 p-3">
+            <span className="rounded-xl bg-muted/65 p-3">
+              Distanță
+              <strong className="mt-1 block text-sm">{formatDistanceKm(displayDistanceToPickupKm)}</strong>
+            </span>
+            <span className="rounded-xl bg-muted/65 p-3">
               Plată
-              <strong className="mt-1 block text-sm">{payment.paymentMethod === "cash" ? "Cash" : "Card"}</strong>
+              <strong className="mt-1 flex items-center gap-1.5 text-sm">
+                <PaymentIcon className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                {payment.isCash ? "Cash · final" : "Card · pregătit"}
+              </strong>
+            </span>
+            <span className="rounded-xl bg-muted/65 p-3">
+              Cost
+              <strong className="mt-1 block text-sm">{formatCurrency(fareEstimate)}</strong>
             </span>
           </div>
-        </MapFloatingPanel>
-      )}
+          <button
+            type="button"
+            className="min-h-12 w-full rounded-xl border border-border/60 bg-background/55 px-4 text-sm font-semibold transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Anulează
+          </button>
+          </div>
+        )}
+      </MapBottomSheet>
 
       <MapFloatingPanel className="absolute left-3 top-[7rem] z-[520] hidden max-w-[320px] items-center gap-3 md:flex">
         {currentStatus === "searching" ? (

@@ -1,16 +1,29 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, ShieldAlert } from "lucide-react";
+import { ShieldAlert } from "lucide-react";
 import { RoadsideForm, type RoadsideFormValues } from "@/components/roadside/RoadsideForm";
-import { MobilityMap } from "@/components/maps/MobilityMap";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
+import { MapBottomSheet } from "@/components/maps/MapBottomSheet";
+import { MapStatusPill } from "@/components/maps/MapStatusPill";
+import { MapFirstPage } from "@/layouts/MapFirstPage";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useAppStore } from "@/store/useAppStore";
+import type { Coordinates } from "@/types/domain";
+import { haversineDistanceKm, estimateEtaMinutes } from "@/utils/geo";
 
 export function RoadsidePage() {
   const navigate = useNavigate();
   const { position } = useGeolocation();
   const pushNotification = useAppStore((state) => state.pushNotification);
+  const roadsideLocation = useMemo<Coordinates>(
+    () => ({
+      lat: position.lat + 0.018,
+      lng: position.lng - 0.014
+    }),
+    [position.lat, position.lng]
+  );
+  const distanceToOperatorKm = haversineDistanceKm(roadsideLocation, position);
+  const etaToOperatorMinutes = estimateEtaMinutes(distanceToOperatorKm, "roadside_to_pickup");
 
   const submit = (values: RoadsideFormValues) => {
     pushNotification({
@@ -24,39 +37,40 @@ export function RoadsidePage() {
   };
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[420px_1fr]">
-      <section className="space-y-5">
-        <div>
-          <Badge variant="warning">Maximum 2 acțiuni</Badge>
-          <h1 className="mt-3 text-2xl font-semibold">Asistență rutieră</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Alege problema, adaugă detalii și trimite poziția curentă.</p>
-        </div>
+    <MapFirstPage bottomSafeArea={false}>
+      <LiveMobilityMap
+        portalLabel="Roadside"
+        activeRole="customer"
+        serviceType="roadside"
+        status="online"
+        userLocation={position}
+        pickupLocation={position}
+        roadsideLocation={roadsideLocation}
+        etaToPickupMinutes={etaToOperatorMinutes}
+        distanceToPickupKm={distanceToOperatorKm}
+        paymentMethod="cash"
+        cashEnabled
+        fareEstimate={95}
+        rating={4.92}
+        showBottomControls={false}
+        className="min-h-[100svh] lg:min-h-[calc(100vh-4rem)]"
+      />
 
-        <Card className="p-5">
-          <RoadsideForm onSubmit={submit} />
-        </Card>
-      </section>
-
-      <aside className="space-y-5">
-        <MobilityMap pickup={position} />
-        <Card className="p-5">
-          <div className="flex gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-lg bg-secondary">
-              <ShieldAlert className="h-5 w-5" />
+      <MapBottomSheet className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-[540] max-h-[min(62svh,560px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:left-5 md:w-[420px] md:rounded-3xl">
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground">
+              <ShieldAlert className="h-5 w-5" aria-hidden="true" />
             </span>
             <div>
-              <h2 className="font-semibold">Poziție client</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Lat {position.lat.toFixed(5)}, Lng {position.lng.toFixed(5)}
-              </p>
-              <p className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                Actualizare realtime activă
-              </p>
+              <p className="text-sm font-semibold">Asistență rutieră</p>
+              <p className="text-xs text-muted-foreground">Trimite poziția și problema către operator.</p>
             </div>
           </div>
-        </Card>
-      </aside>
-    </div>
+          <MapStatusPill label={`~${etaToOperatorMinutes} min`} tone="success" />
+        </div>
+        <RoadsideForm onSubmit={submit} />
+      </MapBottomSheet>
+    </MapFirstPage>
   );
 }

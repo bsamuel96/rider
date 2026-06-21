@@ -10,7 +10,7 @@ export function MapFloatingButton({ className, active, ...props }: MapFloatingBu
     <button
       type="button"
       className={cn(
-        "grid min-h-11 min-w-11 place-items-center rounded-2xl border border-border/60 bg-background/85 px-3 text-sm font-semibold shadow-map-control backdrop-blur-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "map-glass-control map-layer-control grid min-h-11 min-w-11 place-items-center px-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         active && "border-primary bg-primary text-primary-foreground",
         className
       )}

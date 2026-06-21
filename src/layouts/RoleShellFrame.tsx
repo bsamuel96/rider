@@ -106,10 +106,13 @@ export function RoleShellFrame({
       </main>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-2 py-2 backdrop-blur lg:hidden"
+        className="map-layer-nav fixed inset-x-0 bottom-0 border-t border-border/60 bg-background/90 px-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 backdrop-blur-xl lg:hidden"
         aria-label={`Navigare mobilă ${portalLabel}`}
       >
-        <div className="mx-auto grid max-w-md gap-1" style={{ gridTemplateColumns: `repeat(${Math.min(navItems.length, 5)}, minmax(0, 1fr))` }}>
+        <div
+          className="glass-dock mx-auto grid max-w-md gap-1 p-1"
+          style={{ gridTemplateColumns: `repeat(${Math.min(navItems.length, 5)}, minmax(0, 1fr))` }}
+        >
           {navItems.slice(0, 5).map((item) => (
             <NavLink
               key={item.to}
@@ -117,8 +120,8 @@ export function RoleShellFrame({
               end={item.to === homePath}
               className={({ isActive }) =>
                 cn(
-                  "flex h-14 flex-col items-center justify-center gap-1 rounded-lg text-[11px] font-semibold text-muted-foreground",
-                  isActive && "bg-secondary text-foreground"
+                  "flex h-12 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-semibold text-muted-foreground transition-colors",
+                  isActive && "bg-primary/12 text-primary dark:bg-primary/18"
                 )
               }
             >

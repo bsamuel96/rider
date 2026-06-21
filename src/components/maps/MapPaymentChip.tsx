@@ -12,17 +12,28 @@ type MapPaymentChipProps = {
 export function MapPaymentChip({ paymentMethod = "card", fareEstimate = 42, cashEnabled, onClick }: MapPaymentChipProps) {
   const Icon = paymentMethod === "cash" ? Banknote : CreditCard;
   const label = paymentMethod === "cash" ? "Cash" : "Card";
+  const content = (
+    <>
+      <Icon className="h-4 w-4 text-primary" />
+      {label} · {formatCurrency(fareEstimate)}
+      {cashEnabled && <span className="text-xs text-muted-foreground">de încasat</span>}
+    </>
+  );
+  const className =
+    "glass-chip map-layer-control inline-flex min-h-11 items-center gap-2 px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
+  if (!onClick) {
+    return <span className={className}>{content}</span>;
+  }
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex min-h-11 items-center gap-2 rounded-2xl border border-border/60 bg-background/85 px-3 text-sm font-semibold shadow-map-control backdrop-blur-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className={`${className} hover:bg-muted/80`}
       aria-label="Schimbă metoda de plată"
     >
-      <Icon className="h-4 w-4 text-primary" />
-      {label} · {formatCurrency(fareEstimate)}
-      {cashEnabled && <span className="text-xs text-muted-foreground">de încasat</span>}
+      {content}
     </button>
   );
 }

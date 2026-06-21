@@ -1,4 +1,4 @@
-import { FileCheck2, Gauge, Map, RadioTower, Truck, UserRound, Wrench } from "lucide-react";
+import { FileCheck2, Gauge, RadioTower, Truck, UserRound, Wrench } from "lucide-react";
 import { RoleShellFrame, type RoleNavItem } from "@/layouts/RoleShellFrame";
 
 const roadsideNavItems: RoleNavItem[] = [
@@ -7,8 +7,7 @@ const roadsideNavItems: RoleNavItem[] = [
   { to: "/roadside-operator/fleet", label: "Fleet", icon: Wrench },
   { to: "/roadside-operator/vehicles", label: "Vehicule", icon: Truck },
   { to: "/roadside-operator/profile", label: "Profil", icon: UserRound },
-  { to: "/roadside-operator/documents", label: "Documente", icon: FileCheck2 },
-  { to: "/roadside-operator/requests", label: "Hartă", icon: Map }
+  { to: "/roadside-operator/documents", label: "Documente", icon: FileCheck2 }
 ];
 
 export function RoadsideOperatorShell() {

@@ -50,8 +50,8 @@ export function RoadsideForm({ onSubmit }: RoadsideFormProps) {
               key={issue.value}
               onClick={() => form.setValue("issueType", issue.value, { shouldValidate: true })}
               className={cn(
-                "h-11 rounded-lg border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                selectedIssue === issue.value ? "border-primary bg-primary text-primary-foreground" : "bg-card"
+                "h-11 rounded-xl border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                selectedIssue === issue.value ? "border-primary bg-primary text-primary-foreground" : "bg-background/55 hover:bg-muted/70"
               )}
             >
               {issue.label}
@@ -70,7 +70,7 @@ export function RoadsideForm({ onSubmit }: RoadsideFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="photos">Poze</Label>
-        <label className="flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-card p-4 text-sm text-muted-foreground">
+        <label className="flex min-h-24 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed bg-background/45 p-4 text-sm text-muted-foreground transition-colors hover:bg-muted/60">
           <Camera className="h-5 w-5" />
           Upload multiplu pentru avarii sau poziția vehiculului
           <input id="photos" type="file" multiple accept="image/*" className="sr-only" />

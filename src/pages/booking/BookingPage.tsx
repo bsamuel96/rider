@@ -1,11 +1,16 @@
-import { CheckCircle2, CreditCard, MapPinned, Route } from "lucide-react";
+import { useEffect } from "react";
+import { CheckCircle2, Clock3, Route } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AddressSearch } from "@/components/booking/AddressSearch";
+import { MapBottomSheet } from "@/components/maps/MapBottomSheet";
 import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
+import { MapServiceDock } from "@/components/maps/MapServiceDock";
+import { PaymentMethodSelector } from "@/components/payment/PaymentMethodSelector";
 import { MapFirstPage } from "@/layouts/MapFirstPage";
 import { useLiveActorLocations } from "@/hooks/useLiveActorLocations";
 import { usePaymentState } from "@/hooks/usePaymentState";
+import { useStreetRoute } from "@/hooks/useStreetRoute";
 import { calculateBookingEstimate } from "@/services/pricing";
 import { useAppStore } from "@/store/useAppStore";
 import type { BookingDraft, ServiceType } from "@/types/domain";
@@ -30,7 +35,25 @@ export function BookingPage() {
     destinationLocation: bookingDraft.destination,
     serviceType
   });
+  const bookingRoute = useStreetRoute({
+    from: bookingDraft.pickup,
+    to: bookingDraft.destination,
+    enabled: Boolean(bookingDraft.pickup && bookingDraft.destination)
+  });
   const fareEstimate = bookingDraft.fareEstimate || bookingDraft.price || fallbackFare[serviceType];
+  const displayDistanceKm = bookingRoute.distanceKm ?? bookingDraft.distanceKm;
+  const displayDurationMinutes = bookingRoute.durationMinutes ?? bookingDraft.durationMinutes ?? actors.etaToDestinationMinutes ?? 8;
+
+  useEffect(() => {
+    if (bookingRoute.provider === "none" || !bookingRoute.distanceKm || !bookingRoute.durationMinutes) {
+      return;
+    }
+
+    updateBookingDraft({
+      distanceKm: bookingRoute.distanceKm,
+      durationMinutes: bookingRoute.durationMinutes
+    });
+  }, [bookingRoute.distanceKm, bookingRoute.durationMinutes, bookingRoute.provider, updateBookingDraft]);
 
   const updateEstimate = (patch: Partial<BookingDraft> = {}) => {
     const nextDraft = calculateBookingEstimate({
@@ -48,17 +71,29 @@ export function BookingPage() {
     });
   };
 
-  const canConfirm = Boolean(bookingDraft.pickup && bookingDraft.destination && bookingDraft.serviceType);
+  const canConfirm = Boolean(bookingDraft.pickup && bookingDraft.destination && serviceType);
 
   const confirm = () => {
     if (!canConfirm) {
       return;
     }
 
+    updateBookingDraft({
+      serviceType,
+      paymentMethod: payment.paymentMethod,
+      cashRequired: payment.isCash,
+      cashStatus: payment.isCash ? "pending_collection" : "not_required",
+      fareEstimate,
+      currency: "RON"
+    });
+
     pushNotification({
       id: crypto.randomUUID(),
       title: "Comandă trimisă",
-      body: payment.paymentMethod === "cash" ? "Căutăm șofer. Plata cash va fi confirmată la final." : "Căutăm cel mai apropiat șofer disponibil.",
+      body:
+        payment.paymentMethod === "cash"
+          ? "Căutăm șofer. Plata cash va fi confirmată la final."
+          : "Căutăm șofer. Plata cu cardul va fi procesată la final.",
       read: false,
       createdAt: new Date().toISOString()
     });
@@ -87,14 +122,13 @@ export function BookingPage() {
         rating={4.9}
         primaryActionLabel={canConfirm ? "Confirmă" : "Completează traseul"}
         secondaryActionLabel="Curăță"
+        showBottomControls={false}
         onPrimaryAction={confirm}
         onSecondaryAction={() => updateBookingDraft({ destination: undefined, distanceKm: undefined, durationMinutes: undefined, price: undefined })}
-        onCashToggle={payment.togglePaymentMethod}
-        onServiceChange={(nextService) => updateEstimate({ serviceType: nextService })}
         className="min-h-[100svh] lg:min-h-[calc(100vh-4rem)]"
       />
 
-      <MapFloatingPanel className="absolute inset-x-3 top-[7rem] z-[520] space-y-3 p-3 md:left-5 md:right-auto md:w-[430px]">
+      <MapFloatingPanel className="absolute inset-x-3 top-[calc(env(safe-area-inset-top)+6.25rem)] z-[520] space-y-3 p-3 md:left-5 md:right-auto md:w-[430px]">
         <AddressSearch
           label="Pickup"
           placeholder="De unde pleci?"
@@ -111,62 +145,53 @@ export function BookingPage() {
         />
       </MapFloatingPanel>
 
-      <aside className="pointer-events-none absolute right-5 top-24 z-[520] hidden w-[360px] space-y-3 xl:block">
-        <MapFloatingPanel className="pointer-events-auto space-y-4">
-          <div className="flex items-start gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary text-primary-foreground">
-              <Route className="h-5 w-5" aria-hidden="true" />
+      <MapBottomSheet className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-[540] max-h-[min(54svh,460px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:right-5 md:w-[380px]">
+        <div className="space-y-3">
+          <MapServiceDock value={serviceType} onChange={(nextService) => updateEstimate({ serviceType: nextService })} />
+          <PaymentMethodSelector
+            value={payment.paymentMethod}
+            onChange={payment.setPaymentMethod}
+            fareEstimate={fareEstimate}
+          />
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <span className="rounded-xl bg-muted/65 p-3">
+              Cost
+              <strong className="mt-1 block text-sm">{formatCurrency(fareEstimate)}</strong>
             </span>
-            <div>
-              <h1 className="font-semibold">Confirmare cursă</h1>
-              <p className="mt-1 text-sm text-muted-foreground">Alege traseul, serviciul și metoda de plată direct peste hartă.</p>
-            </div>
+            <span className="rounded-xl bg-muted/65 p-3">
+              ETA
+              <strong className="mt-1 block text-sm">~{displayDurationMinutes} min</strong>
+            </span>
+            <span className="rounded-xl bg-muted/65 p-3">
+              Rută
+              <strong className="mt-1 block truncate text-sm">{formatDistance(displayDistanceKm)}</strong>
+            </span>
           </div>
-          <dl className="grid gap-3 text-sm">
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Pickup</dt>
-              <dd className="max-w-[58%] truncate font-medium">{bookingDraft.pickup?.label || "Neales"}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Destinație</dt>
-              <dd className="max-w-[58%] truncate font-medium">{bookingDraft.destination?.label || "Nealeasă"}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Distanță</dt>
-              <dd className="font-medium">{formatDistance(bookingDraft.distanceKm)}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Durată</dt>
-              <dd className="font-medium">{bookingDraft.durationMinutes || actors.etaToDestinationMinutes || 0} min</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Cost</dt>
-              <dd className="font-semibold">{formatCurrency(fareEstimate)}</dd>
-            </div>
-            <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Plată</dt>
-              <dd className="inline-flex items-center gap-2 font-medium">
-                <CreditCard className="h-4 w-4 text-primary" aria-hidden="true" />
-                {payment.paymentMethod === "cash" ? "Cash" : "Card"}
-              </dd>
-            </div>
-          </dl>
-          <button
-            type="button"
-            onClick={confirm}
-            disabled={!canConfirm}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-            Confirmă
-          </button>
-        </MapFloatingPanel>
-
-        <MapFloatingPanel className="pointer-events-auto flex items-center gap-3">
-          <MapPinned className="h-4 w-4 text-primary" aria-hidden="true" />
-          <p className="text-sm text-muted-foreground">ETA este aproximativ, calculat pe distanță urbană.</p>
-        </MapFloatingPanel>
-      </aside>
+          <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+            <button
+              type="button"
+              onClick={confirm}
+              disabled={!canConfirm}
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+              {canConfirm ? "Confirmă cursa" : "Completează traseul"}
+            </button>
+            <button
+              type="button"
+              onClick={() => updateBookingDraft({ destination: undefined, distanceKm: undefined, durationMinutes: undefined, price: undefined })}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-border/60 bg-background/55 px-4 text-sm font-semibold transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Route className="h-4 w-4" aria-hidden="true" />
+              Curăță
+            </button>
+          </div>
+          <p className="inline-flex items-center gap-2 px-1 text-xs text-muted-foreground">
+            <Clock3 className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+            ETA și prețul se actualizează când alegi traseul.
+          </p>
+        </div>
+      </MapBottomSheet>
     </MapFirstPage>
   );
 }

@@ -5,7 +5,7 @@ export function MapFloatingPanel({ className, ...props }: HTMLAttributes<HTMLDiv
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border/60 bg-background/85 p-4 shadow-floating backdrop-blur-xl",
+        "glass-panel map-layer-panel p-4 text-foreground",
         className
       )}
       {...props}

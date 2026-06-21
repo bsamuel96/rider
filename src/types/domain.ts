@@ -12,6 +12,8 @@ export type PaymentMethod = "cash" | "card";
 
 export type CashStatus = "not_required" | "pending_collection" | "collected" | "disputed";
 
+export type RouteProvider = "osrm" | "fallback" | "none";
+
 export type BookingStatus =
   | "searching"
   | "confirmed"
@@ -129,6 +131,13 @@ export type BookingDraft = {
   cashStatus?: CashStatus;
   fareEstimate?: number;
   currency?: "RON";
+};
+
+export type StreetRoute = {
+  points: Coordinates[];
+  distanceKm?: number;
+  durationMinutes?: number;
+  provider: RouteProvider;
 };
 
 export type RatingTag =

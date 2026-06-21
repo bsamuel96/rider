@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
 import { MapStatusPill } from "@/components/maps/MapStatusPill";
+import { PaymentMethodSelector } from "@/components/payment/PaymentMethodSelector";
 import { MapFirstPage } from "@/layouts/MapFirstPage";
 import { useLiveActorLocations } from "@/hooks/useLiveActorLocations";
 import { usePaymentState } from "@/hooks/usePaymentState";
@@ -64,7 +65,6 @@ export function CustomerDashboardPage() {
         secondaryActionLabel="Roadside"
         onPrimaryAction={() => navigate("/customer/booking")}
         onSecondaryAction={() => navigate("/customer/roadside")}
-        onCashToggle={payment.togglePaymentMethod}
         onServiceChange={selectService}
         className="min-h-[100svh] lg:min-h-[calc(100vh-4rem)]"
       />
@@ -82,6 +82,15 @@ export function CustomerDashboardPage() {
         </span>
         <ArrowRight className="h-5 w-5 text-primary" aria-hidden="true" />
       </button>
+
+      <div className="absolute inset-x-3 top-[11.75rem] z-[520] md:left-5 md:right-auto md:w-[420px]">
+        <PaymentMethodSelector
+          compact
+          value={payment.paymentMethod}
+          onChange={payment.setPaymentMethod}
+          fareEstimate={fareEstimate}
+        />
+      </div>
 
       <aside className="pointer-events-none absolute right-5 top-24 z-[520] hidden w-[360px] space-y-3 xl:block">
         <MapFloatingPanel className="pointer-events-auto space-y-4">

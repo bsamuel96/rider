@@ -2,6 +2,7 @@ import { type LatLngExpression, type LatLngTuple } from "leaflet";
 import { useEffect } from "react";
 import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
 import { MapActorMarker } from "@/components/maps/MapActorMarker";
+import { useStreetRoute } from "@/hooks/useStreetRoute";
 import type { Coordinates } from "@/types/domain";
 import { DEFAULT_CENTER, TILE_URL } from "@/utils/constants";
 
@@ -36,9 +37,16 @@ function MapBounds({ points }: { points: LatLngTuple[] }) {
 }
 
 export function MobilityMap({ pickup, destination, driver, fullscreen = false }: MobilityMapProps) {
-  const route = [pickup, destination].filter(Boolean).map((point) => [point!.lat, point!.lng] as LatLngTuple);
+  const streetRoute = useStreetRoute({
+    from: pickup,
+    to: destination,
+    enabled: Boolean(pickup && destination)
+  });
+  const route = streetRoute.routePoints.map((point) => [point.lat, point.lng] as LatLngTuple);
   const points = [pickup, destination, driver].filter(Boolean).map((point) => [point!.lat, point!.lng] as LatLngTuple);
+  const bounds = route.length >= 2 ? [...points, ...route] : points;
   const center: LatLngExpression = pickup ? [pickup.lat, pickup.lng] : [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng];
+  const routeIsFallback = streetRoute.provider === "fallback";
 
   return (
     <div className={fullscreen ? "h-[calc(100vh-4rem)] overflow-hidden rounded-2xl" : "h-72 overflow-hidden rounded-2xl shadow-map-control"}>
@@ -47,12 +55,31 @@ export function MobilityMap({ pickup, destination, driver, fullscreen = false }:
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url={TILE_URL}
         />
-        <MapBounds points={points} />
+        <MapBounds points={bounds} />
         <MapActorMarker type="pickup" position={pickup} label="Pickup" />
         <MapActorMarker type="destination" position={destination} label="Destinație" />
         <MapActorMarker type="driver" position={driver} label="Șofer" etaLabel="~6 min" heading={25} />
-        {route.length === 2 && (
-          <Polyline positions={route} pathOptions={{ color: "#14b8a6", weight: 5, opacity: 0.78, dashArray: "8 10" }} />
+        {route.length >= 2 && (
+          <>
+            <Polyline
+              positions={route}
+              pathOptions={{
+                color: "#0f172a",
+                weight: 8,
+                opacity: 0.22,
+                dashArray: routeIsFallback ? "8 10" : undefined
+              }}
+            />
+            <Polyline
+              positions={route}
+              pathOptions={{
+                color: "#14b8a6",
+                weight: 5,
+                opacity: 0.9,
+                dashArray: routeIsFallback ? "8 10" : undefined
+              }}
+            />
+          </>
         )}
       </MapContainer>
     </div>

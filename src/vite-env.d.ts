@@ -8,6 +8,9 @@ interface ImportMetaEnv {
   readonly VITE_MAP_PROVIDER?: "openstreetmap" | "maplibre";
   readonly VITE_NOMINATIM_URL?: string;
   readonly VITE_TILE_URL?: string;
+  readonly VITE_ROUTING_PROVIDER?: "osrm" | "fallback";
+  readonly VITE_OSRM_ROUTE_URL?: string;
+  readonly VITE_OSRM_PROFILE?: "driving" | "walking" | "cycling";
   readonly VITE_DEFAULT_LAT?: string;
   readonly VITE_DEFAULT_LNG?: string;
   readonly VITE_ENABLE_DARK_MODE?: string;

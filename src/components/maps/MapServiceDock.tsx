@@ -16,15 +16,15 @@ type MapServiceDockProps = {
 
 export function MapServiceDock({ value, onChange }: MapServiceDockProps) {
   return (
-    <div className="grid grid-cols-4 gap-2 rounded-2xl border border-border/60 bg-background/85 p-2 shadow-floating backdrop-blur-xl">
+    <div className="glass-dock map-layer-dock grid grid-cols-4 gap-2 p-2">
       {serviceItems.map((item) => (
         <button
           key={item.type}
           type="button"
           onClick={() => onChange(item.type)}
           className={cn(
-            "flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-2 text-[11px] font-semibold text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            value === item.type && "bg-primary text-primary-foreground"
+            "flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-2 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            value === item.type && "bg-primary text-primary-foreground shadow-map-control"
           )}
         >
           <item.icon className="h-4 w-4" />

@@ -1,6 +1,6 @@
 import { type LatLngExpression, type LatLngTuple } from "leaflet";
-import { Bell, LocateFixed, Phone, ShieldAlert } from "lucide-react";
-import { useEffect } from "react";
+import { LocateFixed, Phone, ShieldAlert } from "lucide-react";
+import { useEffect, useMemo } from "react";
 import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
 import { MapActorMarker } from "@/components/maps/MapActorMarker";
 import { MapEtaChip } from "@/components/maps/MapEtaChip";
@@ -11,6 +11,7 @@ import { MapRatingPanel } from "@/components/maps/MapRatingPanel";
 import { MapServiceDock } from "@/components/maps/MapServiceDock";
 import { MapStatusPill } from "@/components/maps/MapStatusPill";
 import { MapThemeToggle } from "@/components/maps/MapThemeToggle";
+import { useStreetRoute } from "@/hooks/useStreetRoute";
 import type { AuthInstance, BookingStatus, Coordinates, PaymentMethod, ServiceType } from "@/types/domain";
 import { DEFAULT_CENTER, STATUS_LABELS, TILE_URL } from "@/utils/constants";
 import { formatCurrency } from "@/utils/format";
@@ -35,6 +36,7 @@ type LiveMobilityMapProps = {
   fareEstimate?: number;
   rating?: number;
   showMainActions?: boolean;
+  showBottomControls?: boolean;
   primaryActionLabel?: string;
   secondaryActionLabel?: string;
   portalLabel: string;
@@ -91,6 +93,7 @@ export function LiveMobilityMap({
   fareEstimate = 42,
   rating,
   showMainActions = true,
+  showBottomControls = true,
   primaryActionLabel = "Confirmă",
   secondaryActionLabel,
   portalLabel,
@@ -108,14 +111,45 @@ export function LiveMobilityMap({
   const points = [userLocation, pickupLocation, destinationLocation, driverLocation, roadsideLocation]
     .filter(Boolean)
     .map((point) => [point!.lat, point!.lng] as LatLngTuple);
-  const route = [pickupLocation || userLocation, destinationLocation]
-    .filter(Boolean)
-    .map((point) => [point!.lat, point!.lng] as LatLngTuple);
+  const hasRoadsideActor = serviceType === "tow" || serviceType === "roadside" || activeRole === "roadside";
+  const routePair = useMemo(
+    () =>
+      getRoutePair({
+        activeRole,
+        serviceType,
+        status,
+        userLocation,
+        pickupLocation,
+        destinationLocation,
+        driverLocation,
+        roadsideLocation
+      }),
+    [activeRole, destinationLocation, driverLocation, pickupLocation, roadsideLocation, serviceType, status, userLocation]
+  );
+  const streetRoute = useStreetRoute({
+    from: routePair?.from,
+    to: routePair?.to,
+    enabled: Boolean(routePair)
+  });
+  const route = streetRoute.routePoints.map((point) => [point.lat, point.lng] as LatLngTuple);
+  const routeBounds = route.length >= 2 ? [...points, ...route] : points;
   const center: LatLngExpression = userLocation
     ? [userLocation.lat, userLocation.lng]
     : [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng];
-  const hasRoadsideActor = serviceType === "tow" || serviceType === "roadside" || activeRole === "roadside";
   const statusLabel = getStatusLabel(status);
+  const routeTargetsPickup = routePair?.target === "pickup";
+  const routeTargetsDestination = routePair?.target === "destination";
+  const displayEtaToPickupMinutes = routeTargetsPickup ? streetRoute.durationMinutes || etaToPickupMinutes : etaToPickupMinutes;
+  const displayDistanceToPickupKm = routeTargetsPickup ? streetRoute.distanceKm || distanceToPickupKm : distanceToPickupKm;
+  const displayEtaToDestinationMinutes = routeTargetsDestination
+    ? streetRoute.durationMinutes || etaToDestinationMinutes
+    : etaToDestinationMinutes;
+  const displayDistanceToDestinationKm = routeTargetsDestination
+    ? streetRoute.distanceKm || distanceToDestinationKm
+    : distanceToDestinationKm;
+  const routeProviderLabel =
+    streetRoute.provider === "osrm" ? "Rută stradală" : streetRoute.provider === "fallback" ? "Rută estimată" : undefined;
+  const routeIsFallback = streetRoute.provider === "fallback";
 
   return (
     <div
@@ -129,9 +163,28 @@ export function LiveMobilityMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url={TILE_URL}
         />
-        <MapBounds points={points} />
-        {route.length === 2 && (
-          <Polyline positions={route} pathOptions={{ color: "#14b8a6", weight: 5, opacity: 0.72, dashArray: "10 10" }} />
+        <MapBounds points={routeBounds} />
+        {route.length >= 2 && (
+          <>
+            <Polyline
+              positions={route}
+              pathOptions={{
+                color: "#0f172a",
+                weight: 8,
+                opacity: 0.22,
+                dashArray: routeIsFallback ? "8 10" : undefined
+              }}
+            />
+            <Polyline
+              positions={route}
+              pathOptions={{
+                color: "#14b8a6",
+                weight: 5,
+                opacity: 0.9,
+                dashArray: routeIsFallback ? "8 10" : undefined
+              }}
+            />
+          </>
         )}
         <MapActorMarker type="user" position={userLocation} label="Tu" pulse />
         <MapActorMarker type="pickup" position={pickupLocation} label="Pickup" />
@@ -140,18 +193,18 @@ export function LiveMobilityMap({
           type="driver"
           position={driverLocation}
           label={actorLabel || "Șofer"}
-          etaLabel={!hasRoadsideActor ? formatEta(etaToPickupMinutes) : undefined}
+          etaLabel={!hasRoadsideActor ? formatEta(displayEtaToPickupMinutes) : undefined}
           heading={25}
         />
         <MapActorMarker
           type={serviceType === "tow" ? "tow" : "roadside"}
           position={roadsideLocation}
           label={serviceType === "tow" ? "Platformă" : "Asistență"}
-          etaLabel={hasRoadsideActor ? formatEta(etaToPickupMinutes) : undefined}
+          etaLabel={hasRoadsideActor ? formatEta(displayEtaToPickupMinutes) : undefined}
         />
       </MapContainer>
 
-      <div className="pointer-events-none absolute inset-x-3 top-3 z-[500] flex items-start justify-between gap-3 md:inset-x-5 md:top-5">
+      <div className="pointer-events-none absolute inset-x-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[500] flex items-start justify-between gap-3 md:inset-x-5">
         <div className="pointer-events-auto space-y-2">
           <MapFloatingPanel className="px-3 py-2">
             <p className="text-xs font-semibold text-muted-foreground">{portalLabel}</p>
@@ -160,6 +213,12 @@ export function LiveMobilityMap({
           <div className="flex flex-wrap gap-2">
             <MapStatusPill label={statusLabel} tone={status === "online" || status === "confirmed" ? "success" : status === "new_request" ? "warning" : "default"} />
             {rating && <MapStatusPill label={`${rating.toFixed(2)} ★`} />}
+            {routeProviderLabel && (
+              <MapStatusPill
+                label={streetRoute.loading ? "Calcul rută" : routeProviderLabel}
+                tone={streetRoute.provider === "osrm" ? "success" : "warning"}
+              />
+            )}
           </div>
         </div>
 
@@ -168,21 +227,23 @@ export function LiveMobilityMap({
           <MapFloatingButton aria-label="Localizează-mă" title="Localizează-mă" onClick={onLocateMe}>
             <LocateFixed className="h-4 w-4" />
           </MapFloatingButton>
-          <MapFloatingButton aria-label="Notificări" title="Notificări">
-            <Bell className="h-4 w-4" />
-          </MapFloatingButton>
         </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-[500] space-y-2 md:inset-x-auto md:bottom-5 md:left-5 md:w-[420px]">
+      {showBottomControls && (
+      <div className="pointer-events-none absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-[540] space-y-2 md:inset-x-auto md:bottom-5 md:left-5 md:w-[420px]">
         <div className="pointer-events-auto flex flex-wrap gap-2">
           <MapEtaChip
             label={hasRoadsideActor ? "Echipaj" : "Șofer"}
-            minutes={etaToPickupMinutes}
-            distanceKm={distanceToPickupKm}
+            minutes={displayEtaToPickupMinutes}
+            distanceKm={displayDistanceToPickupKm}
           />
-          {etaToDestinationMinutes && (
-            <MapEtaChip label="Destinație" minutes={etaToDestinationMinutes} distanceKm={distanceToDestinationKm} />
+          {displayEtaToDestinationMinutes !== undefined && (
+            <MapEtaChip
+              label="Destinație"
+              minutes={displayEtaToDestinationMinutes}
+              distanceKm={displayDistanceToDestinationKm}
+            />
           )}
           <MapPaymentChip
             paymentMethod={paymentMethod}
@@ -245,8 +306,68 @@ export function LiveMobilityMap({
           </>
         )}
       </div>
+      )}
     </div>
   );
+}
+
+type RoutePair = {
+  from: Coordinates;
+  to: Coordinates;
+  target: "pickup" | "destination";
+};
+
+function getRoutePair(params: {
+  activeRole: LiveMobilityMapProps["activeRole"];
+  serviceType?: ServiceType;
+  status: LiveMobilityMapProps["status"];
+  userLocation?: Coordinates;
+  pickupLocation?: Coordinates;
+  destinationLocation?: Coordinates;
+  driverLocation?: Coordinates;
+  roadsideLocation?: Coordinates;
+}): RoutePair | undefined {
+  const isRoadsideService =
+    params.serviceType === "tow" || params.serviceType === "roadside" || params.activeRole === "roadside";
+
+  if (params.status === "driver_en_route" && !isRoadsideService && params.driverLocation && params.pickupLocation) {
+    return {
+      from: params.driverLocation,
+      to: params.pickupLocation,
+      target: "pickup"
+    };
+  }
+
+  if (
+    isRoadsideService &&
+    params.roadsideLocation &&
+    params.pickupLocation &&
+    (params.status === "driver_en_route" || params.status === "accepted" || params.status === "new_request")
+  ) {
+    return {
+      from: params.roadsideLocation,
+      to: params.pickupLocation,
+      target: "pickup"
+    };
+  }
+
+  if (params.pickupLocation && params.destinationLocation) {
+    return {
+      from: params.pickupLocation,
+      to: params.destinationLocation,
+      target: "destination"
+    };
+  }
+
+  if (params.userLocation && params.destinationLocation) {
+    return {
+      from: params.userLocation,
+      to: params.destinationLocation,
+      target: "destination"
+    };
+  }
+
+  return undefined;
 }
 
 function getStatusLabel(status: LiveMobilityMapProps["status"]) {
