@@ -1,4 +1,4 @@
-import { Car, ShieldCheck, UserRound } from "lucide-react";
+import { Building2, Car, ShieldCheck, UserRound } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthRoleTabs } from "@/components/auth/AuthRoleTabs";
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -43,6 +43,18 @@ const demoProfiles: Record<AuthInstance, Profile> = {
     fullName: "Operator Roadside Demo",
     role: "roadside_operator",
     activeInstance: "roadside",
+    registrationStatus: "active",
+    theme: "system",
+    preferredPaymentMethod: "cash"
+  },
+  fleet_manager: {
+    id: "demo-fleet-manager",
+    email: "fleet@rider.demo",
+    phone: "+40 700 000 004",
+    username: "demo_fleet",
+    fullName: "Fleet Manager Demo",
+    role: "fleet_manager",
+    activeInstance: "fleet_manager",
     registrationStatus: "active",
     theme: "system",
     preferredPaymentMethod: "cash"
@@ -110,7 +122,7 @@ export function AuthPage() {
 
         <Card className="mx-auto w-full max-w-2xl p-4">
           <h2 className="text-sm font-semibold">Intră rapid în demo</h2>
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <div className="mt-3 grid gap-2 sm:grid-cols-4">
             <Button type="button" variant="outline" onClick={() => enterDemo("customer")}>
               <UserRound className="h-4 w-4" />
               Demo Client
@@ -122,6 +134,10 @@ export function AuthPage() {
             <Button type="button" variant="outline" onClick={() => enterDemo("roadside")}>
               <ShieldCheck className="h-4 w-4" />
               Demo Roadside
+            </Button>
+            <Button type="button" variant="outline" onClick={() => enterDemo("fleet_manager")}>
+              <Building2 className="h-4 w-4" />
+              Demo Fleet Manager
             </Button>
           </div>
         </Card>

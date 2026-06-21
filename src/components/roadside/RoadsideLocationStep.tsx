@@ -1,4 +1,4 @@
-import { MapPin, Navigation } from "lucide-react";
+import { MapPin, MapPinned, Navigation } from "lucide-react";
 import { useState } from "react";
 import { AddressSearch } from "@/components/booking/AddressSearch";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ type RoadsideLocationStepProps = {
   currentAddress: AddressSuggestion;
   onUseCurrentLocation: () => void;
   onAddressSelect: (address: AddressSuggestion) => void;
+  onPickOnMap: () => void;
   onNext: () => void;
 };
 
@@ -15,6 +16,7 @@ export function RoadsideLocationStep({
   currentAddress,
   onUseCurrentLocation,
   onAddressSelect,
+  onPickOnMap,
   onNext
 }: RoadsideLocationStepProps) {
   const [editing, setEditing] = useState(false);
@@ -33,13 +35,18 @@ export function RoadsideLocationStep({
           <p className="truncate text-sm font-semibold">{currentAddress.label}</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Lat {currentAddress.lat.toFixed(5)}, Lng {currentAddress.lng.toFixed(5)}
+            {currentAddress.source === "map_pin" ? " · Pin pe hartă" : ""}
           </p>
         </div>
       </div>
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="grid gap-2 sm:grid-cols-3">
         <Button type="button" variant="outline" onClick={onUseCurrentLocation}>
           <Navigation className="h-4 w-4" />
           Folosește locația mea
+        </Button>
+        <Button type="button" variant="outline" onClick={onPickOnMap} aria-label="Alege locația roadside pe hartă">
+          <MapPinned className="h-4 w-4" />
+          Alege pe hartă
         </Button>
         <Button type="button" variant="outline" onClick={() => setEditing((value) => !value)}>
           Schimbă adresa
@@ -52,6 +59,7 @@ export function RoadsideLocationStep({
           currentLat={currentAddress.lat}
           currentLng={currentAddress.lng}
           value={currentAddress}
+          onPickOnMap={onPickOnMap}
           onSelect={(address) => {
             onAddressSelect(address);
             setEditing(false);

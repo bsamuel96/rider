@@ -5,6 +5,7 @@ import { RoleBasedRedirect } from "@/components/auth/RoleBasedRedirect";
 import { AdminShell } from "@/layouts/AdminShell";
 import { CustomerShell } from "@/layouts/CustomerShell";
 import { DriverShell } from "@/layouts/DriverShell";
+import { FleetManagerShell } from "@/layouts/FleetManagerShell";
 import { RoadsideOperatorShell } from "@/layouts/RoadsideOperatorShell";
 import { AdminApprovalsPage } from "@/pages/admin/AdminApprovalsPage";
 import { AdminPage } from "@/pages/admin/AdminPage";
@@ -24,6 +25,13 @@ import { DriverPendingPage } from "@/pages/driver/DriverPendingPage";
 import { DriverRideDetailPage } from "@/pages/driver/DriverRideDetailPage";
 import { DriverRidesPage } from "@/pages/driver/DriverRidesPage";
 import { DriverVehiclePage } from "@/pages/driver/DriverVehiclePage";
+import { FleetAnalyticsPage } from "@/pages/fleet-manager/FleetAnalyticsPage";
+import { FleetJobsPage } from "@/pages/fleet-manager/FleetJobsPage";
+import { FleetManagerDashboardPage } from "@/pages/fleet-manager/FleetManagerDashboardPage";
+import { FleetPeoplePage } from "@/pages/fleet-manager/FleetPeoplePage";
+import { FleetVehiclesPage } from "@/pages/fleet-manager/FleetVehiclesPage";
+import { RoadsideFleetPage as FleetRoadsideFleetPage } from "@/pages/fleet-manager/RoadsideFleetPage";
+import { TransportFleetPage } from "@/pages/fleet-manager/TransportFleetPage";
 import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { RoadsideOperatorDashboardPage } from "@/pages/roadside-operator/RoadsideOperatorDashboardPage";
 import { RoadsideOperatorPendingPage } from "@/pages/roadside-operator/RoadsideOperatorPendingPage";
@@ -115,6 +123,26 @@ export const router = createBrowserRouter([
     ]
   },
   {
+    path: "/fleet-manager",
+    element: (
+      <ProtectedRoute allowedRoles={["fleet_manager"]}>
+        <FleetManagerShell />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <FleetManagerDashboardPage /> },
+      { path: "transport", element: <TransportFleetPage /> },
+      { path: "roadside", element: <FleetRoadsideFleetPage /> },
+      { path: "vehicles", element: <FleetVehiclesPage /> },
+      { path: "people", element: <FleetPeoplePage /> },
+      { path: "drivers", element: <FleetPeoplePage /> },
+      { path: "operators", element: <FleetPeoplePage /> },
+      { path: "jobs", element: <FleetJobsPage /> },
+      { path: "analytics", element: <FleetAnalyticsPage /> },
+      { path: "profile", element: <ProfilePage /> }
+    ]
+  },
+  {
     path: "/admin",
     element: (
       <ProtectedRoute allowedRoles={["admin"]}>
@@ -137,6 +165,7 @@ export const router = createBrowserRouter([
   { path: "/roadside", element: <Navigate to="/customer/roadside" replace /> },
   { path: "/tracking", element: <Navigate to="/customer/tracking" replace /> },
   { path: "/operator", element: <Navigate to="/roadside-operator" replace /> },
+  { path: "/fleet", element: <Navigate to="/fleet-manager" replace /> },
   { path: "/profile", element: <ProfileRedirect /> },
   { path: "*", element: <Navigate to="/" replace /> }
 ]);

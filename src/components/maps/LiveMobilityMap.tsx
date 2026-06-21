@@ -1,7 +1,9 @@
+import type L from "leaflet";
 import { type LatLngExpression, type LatLngTuple } from "leaflet";
-import { LocateFixed, Phone, ShieldAlert } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import { Phone, ShieldAlert } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Polyline, TileLayer, useMap } from "react-leaflet";
+import { LocateMeButton } from "@/components/maps/LocateMeButton";
 import { MapActorMarker } from "@/components/maps/MapActorMarker";
 import { MapEtaChip } from "@/components/maps/MapEtaChip";
 import { MapFloatingButton } from "@/components/maps/MapFloatingButton";
@@ -50,7 +52,7 @@ type LiveMobilityMapProps = {
   onPrimaryAction?: () => void;
   onSecondaryAction?: () => void;
   onCashToggle?: () => void;
-  onLocateMe?: () => void;
+  onLocateMe?: (coordinates: Coordinates) => void;
   onThemeToggle?: () => void;
   onRate?: (rating: number) => void;
   onServiceChange?: (serviceType: ServiceType) => void;
@@ -85,6 +87,16 @@ function MapBounds({ points, mobilePadding }: { points: LatLngTuple[]; mobilePad
           }
     );
   }, [map, mobilePadding, points]);
+
+  return null;
+}
+
+function MapInstanceBridge({ onReady }: { onReady: (map: L.Map) => void }) {
+  const map = useMap();
+
+  useEffect(() => {
+    onReady(map);
+  }, [map, onReady]);
 
   return null;
 }
@@ -127,7 +139,10 @@ export function LiveMobilityMap({
   onServiceChange,
   className
 }: LiveMobilityMapProps) {
-  const points = [userLocation, pickupLocation, destinationLocation, driverLocation, roadsideLocation]
+  const [map, setMap] = useState<L.Map | null>(null);
+  const [focusedUserLocation, setFocusedUserLocation] = useState<Coordinates | undefined>();
+  const displayUserLocation = focusedUserLocation || userLocation;
+  const points = [displayUserLocation, pickupLocation, destinationLocation, driverLocation, roadsideLocation]
     .filter(Boolean)
     .map((point) => [point!.lat, point!.lng] as LatLngTuple);
   const hasRoadsideActor = serviceType === "tow" || serviceType === "roadside" || activeRole === "roadside";
@@ -152,8 +167,8 @@ export function LiveMobilityMap({
   });
   const route = streetRoute.routePoints.map((point) => [point.lat, point.lng] as LatLngTuple);
   const routeBounds = route.length >= 2 ? [...points, ...route] : points;
-  const center: LatLngExpression = userLocation
-    ? [userLocation.lat, userLocation.lng]
+  const center: LatLngExpression = displayUserLocation
+    ? [displayUserLocation.lat, displayUserLocation.lng]
     : [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng];
   const statusLabel = getStatusLabel(status);
   const routeTargetsPickup = routePair?.target === "pickup";
@@ -184,6 +199,7 @@ export function LiveMobilityMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url={TILE_URL}
         />
+        <MapInstanceBridge onReady={setMap} />
         <MapBounds points={routeBounds} mobilePadding={minimal} />
         {route.length >= 2 && (
           <>
@@ -207,7 +223,7 @@ export function LiveMobilityMap({
             />
           </>
         )}
-        <MapActorMarker type="user" position={userLocation} label="Tu" pulse />
+        <MapActorMarker type="user" position={displayUserLocation} label="Tu" pulse />
         <MapActorMarker type="pickup" position={pickupLocation} label="Pickup" />
         <MapActorMarker type="destination" position={destinationLocation} label="Destinație" />
         <MapActorMarker
@@ -246,11 +262,45 @@ export function LiveMobilityMap({
 
         <div className="pointer-events-auto flex flex-col gap-2">
           <MapThemeToggle onToggle={onThemeToggle} />
-          <MapFloatingButton aria-label="Localizează-mă" title="Localizează-mă" onClick={onLocateMe}>
-            <LocateFixed className="h-4 w-4" />
-          </MapFloatingButton>
+          <LocateMeButton
+            map={map}
+            onLocate={(coordinates) => {
+              setFocusedUserLocation(coordinates);
+              onLocateMe?.(coordinates);
+              window.setTimeout(() => {
+                map?.flyTo([coordinates.lat, coordinates.lng], 16, {
+                  animate: true,
+                  duration: 0.65
+                });
+              }, 120);
+            }}
+          />
         </div>
       </div>
+      )}
+
+      {!showTopOverlay && (
+        <div
+          className={cn(
+            "pointer-events-auto absolute right-3 z-[505] flex flex-col gap-2 md:right-5",
+            minimal ? "top-[calc(env(safe-area-inset-top)+4.75rem)]" : "top-[calc(env(safe-area-inset-top)+0.75rem)]"
+          )}
+        >
+          <MapThemeToggle onToggle={onThemeToggle} />
+          <LocateMeButton
+            map={map}
+            onLocate={(coordinates) => {
+              setFocusedUserLocation(coordinates);
+              onLocateMe?.(coordinates);
+              window.setTimeout(() => {
+                map?.flyTo([coordinates.lat, coordinates.lng], 16, {
+                  animate: true,
+                  duration: 0.65
+                });
+              }, 120);
+            }}
+          />
+        </div>
       )}
 
       {shouldShowBottomOverlay && (

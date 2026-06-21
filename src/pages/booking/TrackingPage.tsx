@@ -4,9 +4,11 @@ import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
 import { MapBottomSheet } from "@/components/maps/MapBottomSheet";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
 import { MapRatingPanel } from "@/components/maps/MapRatingPanel";
+import { RoadsideGuaranteeBanner } from "@/components/roadside/RoadsideGuaranteeBanner";
 import { MapFirstPage } from "@/layouts/MapFirstPage";
 import { useLiveActorLocations } from "@/hooks/useLiveActorLocations";
 import { usePaymentState } from "@/hooks/usePaymentState";
+import { useRoadsideGuarantee } from "@/hooks/useRoadsideGuarantee";
 import { useStreetRoute } from "@/hooks/useStreetRoute";
 import { useAppStore } from "@/store/useAppStore";
 import type { BookingStatus, Coordinates, ServiceType } from "@/types/domain";
@@ -76,6 +78,11 @@ export function TrackingPage() {
   const displayEtaToPickupMinutes = trackingRoute.durationMinutes ?? etaToPickupMinutes;
   const fareEstimate = draft.fareEstimate || draft.price || (isRoadsideService ? 180 : 42);
   const PaymentIcon = payment.isCash ? Banknote : CreditCard;
+  const guarantee = useRoadsideGuarantee({
+    speedTier: draft.roadsideSpeedTier || "normal",
+    deadline: draft.roadsideFastGuaranteeDeadline,
+    fastGuaranteeApplied: draft.roadsideFastGuaranteeApplied
+  });
 
   return (
     <MapFirstPage bottomSafeArea={false}>
@@ -109,6 +116,9 @@ export function TrackingPage() {
           <MapRatingPanel roadside={isRoadsideService} />
         ) : (
           <div className="space-y-3">
+          {isRoadsideService && (
+            <RoadsideGuaranteeBanner status={guarantee.status} remainingMinutes={guarantee.remainingMinutes} />
+          )}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground">

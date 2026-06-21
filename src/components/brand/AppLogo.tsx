@@ -3,9 +3,10 @@ import { cn } from "@/utils/cn";
 type AppLogoProps = {
   className?: string;
   markClassName?: string;
+  showWordmark?: boolean;
 };
 
-export function AppLogo({ className, markClassName }: AppLogoProps) {
+export function AppLogo({ className, markClassName, showWordmark = true }: AppLogoProps) {
   return (
     <span className={cn("inline-flex items-center gap-3", className)}>
       <span
@@ -17,7 +18,7 @@ export function AppLogo({ className, markClassName }: AppLogoProps) {
       >
         R
       </span>
-      <span className="text-lg font-black tracking-normal">Rider</span>
+      {showWordmark && <span className="text-lg font-black tracking-normal">Rider</span>}
     </span>
   );
 }

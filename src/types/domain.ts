@@ -1,6 +1,6 @@
-export type AuthInstance = "customer" | "driver" | "roadside";
+export type AuthInstance = "customer" | "driver" | "roadside" | "fleet_manager";
 
-export type UserRole = "client" | "driver" | "roadside_operator" | "admin";
+export type UserRole = "client" | "driver" | "roadside_operator" | "fleet_manager" | "admin";
 
 export type RegistrationStatus = "draft" | "pending_review" | "active" | "suspended" | "rejected";
 
@@ -44,10 +44,50 @@ export type DriverWorkflowStatus =
 
 export type RoadsideIssue = "flat_tire" | "battery" | "engine" | "accident" | "fuel" | "locked_keys" | "other";
 
+export type RoadsideSpeedTier = "normal" | "fast";
+
+export type RoadsideRequestStatus =
+  | "draft"
+  | "searching"
+  | "accepted"
+  | "operator_en_route"
+  | "operator_arrived_pending_customer"
+  | "operator_arrived_confirmed"
+  | "issue_in_progress"
+  | "issue_solved_pending_customer"
+  | "issue_solved_confirmed"
+  | "completed"
+  | "cancelled"
+  | "disputed";
+
+export type RoadsideRequest = {
+  id: string;
+  userId: string;
+  operatorId?: string;
+  issueType: RoadsideIssue;
+  speedTier: RoadsideSpeedTier;
+  normalPrice: number;
+  fastPrice: number;
+  finalPrice: number;
+  fastGuaranteeDeadline?: string;
+  fastGuaranteeApplied?: boolean;
+  acceptedAt?: string;
+  customerConfirmedArrivedAt?: string;
+  customerConfirmedSolvedAt?: string;
+  paymentMethod: PaymentMethod;
+  status: RoadsideRequestStatus;
+};
+
+export type FleetType = "transport" | "roadside";
+
+export type FleetVehicleKind = "standard_car" | "premium_car" | "tow_truck" | "service_van" | "utility_vehicle";
+
 export type Coordinates = {
   lat: number;
   lng: number;
 };
+
+export type LocationSelectionSource = "search" | "current_location" | "map_pin" | "recent" | "favorite";
 
 export type AddressSuggestion = Coordinates & {
   id: string;
@@ -56,6 +96,9 @@ export type AddressSuggestion = Coordinates & {
   number?: string;
   city?: string;
   county?: string;
+  source?: LocationSelectionSource;
+  accuracyMeters?: number;
+  rawAddress?: unknown;
 };
 
 export type SavedAddress = AddressSuggestion & {
@@ -75,6 +118,12 @@ export type Profile = {
   registrationStatus: RegistrationStatus;
   theme: ThemePreference;
   preferredPaymentMethod?: PaymentMethod;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  language?: string;
+  defaultAddress?: string;
+  homeAddress?: string;
+  workAddress?: string;
 };
 
 export type CustomerNotification = {
@@ -94,6 +143,7 @@ export type RecentLocation = {
   lat: number;
   lng: number;
   lastUsedAt: string;
+  source?: LocationSelectionSource;
 };
 
 export type DriverProfile = {
@@ -133,7 +183,12 @@ export type VehicleProfile = {
   color?: string;
   productionYear?: number;
   seats?: number;
+  fuelType?: string;
   capacityKg?: number;
+  photoUrl?: string;
+  notes?: string;
+  equipment?: string;
+  serviceTypes?: string[];
   vehicleStatus: "pending_review" | "active" | "maintenance" | "suspended" | "retired";
 };
 
@@ -170,6 +225,12 @@ export type BookingDraft = {
   cashStatus?: CashStatus;
   fareEstimate?: number;
   currency?: "RON";
+  roadsideSpeedTier?: RoadsideSpeedTier;
+  roadsideNormalPrice?: number;
+  roadsideFastPrice?: number;
+  roadsideFinalPrice?: number;
+  roadsideFastGuaranteeDeadline?: string;
+  roadsideFastGuaranteeApplied?: boolean;
 };
 
 export type DriverRideOffer = {

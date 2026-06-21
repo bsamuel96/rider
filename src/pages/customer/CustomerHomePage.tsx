@@ -1,18 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { CustomerGreeting } from "@/components/customer/CustomerGreeting";
 import { CustomerHomeLayout } from "@/components/customer/CustomerHomeLayout";
 import { CustomerHomeLowerSection } from "@/components/customer/CustomerHomeLowerSection";
 import { CustomerHomeSearchBar } from "@/components/customer/CustomerHomeSearchBar";
 import { CustomerNotificationCarousel } from "@/components/customer/CustomerNotificationCarousel";
 import { CustomerServiceChoices } from "@/components/customer/CustomerServiceChoices";
 import { CustomerSplashScreen } from "@/components/customer/CustomerSplashScreen";
+import { CustomerWelcomeHero } from "@/components/customer/CustomerWelcomeHero";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useRoleSplash } from "@/hooks/useRoleSplash";
 import { createCurrentLocationSuggestion } from "@/services/geocoding";
 import { useAppStore } from "@/store/useAppStore";
 import type { AddressSuggestion, RecentLocation, ServiceType } from "@/types/domain";
-
-const splashSessionKey = "customer-splash-seen";
 
 export function CustomerHomePage() {
   const navigate = useNavigate();
@@ -24,7 +23,7 @@ export function CustomerHomePage() {
   const preferredPaymentMethod = useAppStore((state) => state.preferredPaymentMethod);
   const updateBookingDraft = useAppStore((state) => state.updateBookingDraft);
   const dismissCustomerNotification = useAppStore((state) => state.dismissCustomerNotification);
-  const [showSplash, setShowSplash] = useState(() => !sessionStorage.getItem(splashSessionKey));
+  const showSplash = useRoleSplash("customer");
   const pickup = useMemo(
     () => createCurrentLocationSuggestion(position.lat, position.lng),
     [position.lat, position.lng]
@@ -33,23 +32,6 @@ export function CustomerHomePage() {
   const visibleNotifications = customerNotifications.filter(
     (notification) => !dismissedCustomerNotificationIds.includes(notification.id)
   );
-
-  useEffect(() => {
-    if (!showSplash) {
-      return;
-    }
-
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timeout = window.setTimeout(
-      () => {
-        sessionStorage.setItem(splashSessionKey, "true");
-        setShowSplash(false);
-      },
-      prefersReducedMotion ? 450 : 1400
-    );
-
-    return () => window.clearTimeout(timeout);
-  }, [showSplash]);
 
   const openDropoff = (serviceType: Extract<ServiceType, "standard" | "premium"> = "standard", destination?: AddressSuggestion) => {
     updateBookingDraft({
@@ -83,7 +65,8 @@ export function CustomerHomePage() {
       street: location.label,
       city: location.address,
       lat: location.lat,
-      lng: location.lng
+      lng: location.lng,
+      source: "recent"
     });
   };
 
@@ -98,7 +81,7 @@ export function CustomerHomePage() {
         onDismiss={dismissCustomerNotification}
         onAction={navigate}
       />
-      <CustomerGreeting firstName={firstName} />
+      <CustomerWelcomeHero firstName={firstName} />
       <CustomerServiceChoices
         onSelectRide={openDropoff}
         onSelectTow={() => openRoadside("tow")}

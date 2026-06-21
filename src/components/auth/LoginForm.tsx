@@ -19,7 +19,8 @@ type LoginFormProps = {
 const buttonText: Record<AuthInstance, string> = {
   customer: "Intră ca client",
   driver: "Intră ca șofer",
-  roadside: "Intră în dispecerat"
+  roadside: "Intră în dispecerat",
+  fleet_manager: "Intră ca Fleet Manager"
 };
 
 export function LoginForm({ instance }: LoginFormProps) {

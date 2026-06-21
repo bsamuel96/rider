@@ -4,19 +4,24 @@ import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
 import { MapFloatingButton } from "@/components/maps/MapFloatingButton";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
 import { MapStatusPill } from "@/components/maps/MapStatusPill";
+import { NavigateToCustomerButton } from "@/components/navigation/NavigateToCustomerButton";
 import { CashCollectionPanel } from "@/components/payment/CashCollectionPanel";
+import { RoadsideGuaranteeBanner } from "@/components/roadside/RoadsideGuaranteeBanner";
+import { Button } from "@/components/ui/button";
+import { AppSplashScreen } from "@/components/splash/AppSplashScreen";
 import { MapFirstPage } from "@/layouts/MapFirstPage";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import type { CashStatus, Coordinates } from "@/types/domain";
+import { useRoleSplash } from "@/hooks/useRoleSplash";
+import type { BookingStatus, CashStatus, Coordinates, RoadsideRequestStatus } from "@/types/domain";
 import { estimateEtaMinutes, haversineDistanceKm } from "@/utils/geo";
-
-const operatorActions = ["Acceptă intervenția", "Merg spre client", "Am ajuns", "Încep intervenția", "Finalizează"] as const;
-const operatorStatuses = ["new_request", "accepted", "driver_en_route", "arrived", "in_progress", "completed"] as const;
 
 export function RoadsideOperatorDashboardPage() {
   const { position } = useGeolocation();
+  const showSplash = useRoleSplash("roadside");
   const [online, setOnline] = useState(true);
   const [step, setStep] = useState(0);
+  const [requestStatus, setRequestStatus] = useState<RoadsideRequestStatus>("searching");
+  const [fastGuaranteeApplied] = useState(false);
   const [cashStatus, setCashStatus] = useState<CashStatus>("pending_collection");
   const clientLocation = useMemo<Coordinates>(
     () => ({
@@ -34,8 +39,8 @@ export function RoadsideOperatorDashboardPage() {
   );
   const distanceToClientKm = haversineDistanceKm(position, clientLocation);
   const etaToClientMinutes = estimateEtaMinutes(distanceToClientKm, "tow_to_pickup");
-  const currentStatus = online ? operatorStatuses[step] : "offline";
-  const actionLabel = online ? operatorActions[step] : "Devino disponibil";
+  const currentStatus = online ? mapRoadsideStatusToMapStatus(requestStatus) : "offline";
+  const actionLabel = online ? getOperatorActionLabel(requestStatus) : "Devino disponibil";
 
   const advance = () => {
     if (!online) {
@@ -43,8 +48,33 @@ export function RoadsideOperatorDashboardPage() {
       return;
     }
 
-    setStep((current) => Math.min(operatorActions.length - 1, current + 1));
+    if (requestStatus === "searching" || requestStatus === "accepted") {
+      setRequestStatus("operator_en_route");
+      setStep(1);
+      return;
+    }
+
+    if (requestStatus === "operator_en_route") {
+      setRequestStatus("operator_arrived_pending_customer");
+      setStep(2);
+      return;
+    }
+
+    if (requestStatus === "operator_arrived_confirmed") {
+      setRequestStatus("issue_in_progress");
+      setStep(3);
+      return;
+    }
+
+    if (requestStatus === "issue_in_progress") {
+      setRequestStatus("issue_solved_pending_customer");
+      setStep(4);
+    }
   };
+
+  if (showSplash) {
+    return <AppSplashScreen role="roadside" />;
+  }
 
   return (
     <MapFirstPage bottomSafeArea={false}>
@@ -110,6 +140,26 @@ export function RoadsideOperatorDashboardPage() {
               <Phone className="h-4 w-4" aria-hidden="true" />
             </MapFloatingButton>
           </div>
+          {step >= 1 && (
+            <NavigateToCustomerButton
+              coordinates={clientLocation}
+              label="Client roadside"
+              compact
+              className="pt-1"
+            >
+              Navighează la client
+            </NavigateToCustomerButton>
+          )}
+          {requestStatus === "operator_arrived_pending_customer" && (
+            <p className="rounded-xl bg-amber-500/12 p-3 text-xs font-semibold text-amber-700 dark:text-amber-300">
+              Așteptăm confirmarea clientului.
+            </p>
+          )}
+          {requestStatus === "issue_solved_pending_customer" && (
+            <p className="rounded-xl bg-amber-500/12 p-3 text-xs font-semibold text-amber-700 dark:text-amber-300">
+              Așteptăm confirmarea clientului pentru rezolvare.
+            </p>
+          )}
         </MapFloatingPanel>
       )}
 
@@ -147,9 +197,26 @@ export function RoadsideOperatorDashboardPage() {
               <strong>4.92 ★</strong>
             </div>
           </div>
+          <RoadsideGuaranteeBanner status={fastGuaranteeApplied ? "applied" : "active"} remainingMinutes={18} operatorView />
+          {step >= 1 && (
+            <NavigateToCustomerButton coordinates={clientLocation} label="Client roadside">
+              Navighează la client
+            </NavigateToCustomerButton>
+          )}
+          {requestStatus === "operator_arrived_pending_customer" && (
+            <Button type="button" variant="outline" onClick={() => setRequestStatus("operator_arrived_confirmed")}>
+              Demo: clientul a confirmat sosirea
+            </Button>
+          )}
+          {requestStatus === "issue_solved_pending_customer" && (
+            <Button type="button" variant="outline" onClick={() => setRequestStatus("completed")}>
+              Demo: clientul a confirmat rezolvarea
+            </Button>
+          )}
           <button
             type="button"
             onClick={advance}
+            disabled={requestStatus === "operator_arrived_pending_customer" || requestStatus === "issue_solved_pending_customer" || requestStatus === "completed"}
             className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
@@ -159,4 +226,44 @@ export function RoadsideOperatorDashboardPage() {
       </aside>
     </MapFirstPage>
   );
+}
+
+function getOperatorActionLabel(status: RoadsideRequestStatus) {
+  const labels: Partial<Record<RoadsideRequestStatus, string>> = {
+    searching: "Acceptă intervenția",
+    accepted: "Merg spre client",
+    operator_en_route: "Am ajuns la client",
+    operator_arrived_pending_customer: "Așteptăm confirmarea clientului",
+    operator_arrived_confirmed: "Încep intervenția",
+    issue_in_progress: "Problema este rezolvată",
+    issue_solved_pending_customer: "Așteptăm confirmarea clientului",
+    completed: "Finalizat",
+    disputed: "Dispută în review"
+  };
+
+  return labels[status] || "Continuă";
+}
+
+function mapRoadsideStatusToMapStatus(status: RoadsideRequestStatus): BookingStatus | "new_request" | "accepted" {
+  if (status === "searching") {
+    return "new_request";
+  }
+
+  if (status === "operator_en_route") {
+    return "driver_en_route";
+  }
+
+  if (status === "operator_arrived_pending_customer" || status === "operator_arrived_confirmed") {
+    return "arrived";
+  }
+
+  if (status === "issue_in_progress" || status === "issue_solved_pending_customer") {
+    return "in_progress";
+  }
+
+  if (status === "completed" || status === "issue_solved_confirmed") {
+    return "completed";
+  }
+
+  return "accepted";
 }

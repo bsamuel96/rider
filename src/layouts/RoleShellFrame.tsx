@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import { Bell, LogOut } from "lucide-react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { AppLogo } from "@/components/brand/AppLogo";
 import { CarHeadlightThemeToggle } from "@/components/theme/CarHeadlightThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -53,9 +54,7 @@ export function RoleShellFrame({
       >
         <div className="container flex h-16 items-center justify-between gap-3">
           <button type="button" className="flex items-center gap-3 text-left" onClick={() => navigate(homePath)}>
-            <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary text-base font-black text-primary-foreground">
-              R
-            </span>
+            <AppLogo markClassName="h-10 w-10 rounded-lg text-base" showWordmark={false} />
             <span>
               <span className="block text-sm font-semibold">{portalLabel}</span>
               <span className="block text-xs text-muted-foreground">

@@ -1,4 +1,4 @@
-import { MapPin, Navigation } from "lucide-react";
+import { MapPin, MapPinned, Navigation } from "lucide-react";
 import { AddressSearch } from "@/components/booking/AddressSearch";
 import { MobileBottomSheet } from "@/components/mobile/MobileBottomSheet";
 import type { AddressSuggestion } from "@/types/domain";
@@ -9,6 +9,8 @@ type MobileLocationSheetProps = {
   currentLat: number;
   currentLng: number;
   onDestinationSelect: (destination: AddressSuggestion) => void;
+  onPickupPickOnMap: () => void;
+  onDestinationPickOnMap: () => void;
   onContinue: () => void;
 };
 
@@ -18,6 +20,8 @@ export function MobileLocationSheet({
   currentLat,
   currentLng,
   onDestinationSelect,
+  onPickupPickOnMap,
+  onDestinationPickOnMap,
   onContinue
 }: MobileLocationSheetProps) {
   return (
@@ -27,10 +31,20 @@ export function MobileLocationSheet({
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/12 text-primary">
             <Navigation className="h-4 w-4" aria-hidden="true" />
           </span>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">{pickup?.label || "Locația mea curentă"}</p>
-            <p className="text-xs text-muted-foreground">Pickup</p>
+            <p className="text-xs text-muted-foreground">
+              Pickup {pickup?.source === "map_pin" ? "· Pin pe hartă" : ""}
+            </p>
           </div>
+          <button
+            type="button"
+            onClick={onPickupPickOnMap}
+            aria-label="Alege pickup pe hartă"
+            className="grid h-10 w-10 place-items-center rounded-xl bg-background/70 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <MapPinned className="h-4 w-4" aria-hidden="true" />
+          </button>
         </div>
         <AddressSearch
           label="Destinație"
@@ -39,6 +53,7 @@ export function MobileLocationSheet({
           currentLng={currentLng}
           value={destination}
           onSelect={onDestinationSelect}
+          onPickOnMap={onDestinationPickOnMap}
         />
         {destination ? (
           <button

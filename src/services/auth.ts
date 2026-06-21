@@ -14,7 +14,13 @@ function createLocalLoginProfile(instance: AuthInstance): Profile {
     phone: "+40 700 000 000",
     username: `demo_${instance}`,
     fullName:
-      instance === "customer" ? "Client Demo" : instance === "driver" ? "Șofer Demo" : "Operator Roadside Demo",
+      instance === "customer"
+        ? "Client Demo"
+        : instance === "driver"
+          ? "Șofer Demo"
+          : instance === "fleet_manager"
+            ? "Fleet Manager Demo"
+            : "Operator Roadside Demo",
     role,
     activeInstance: instance,
     registrationStatus: "active",

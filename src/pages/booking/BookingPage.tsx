@@ -12,6 +12,7 @@ import { MapBottomSheet } from "@/components/maps/MapBottomSheet";
 import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
 import { MapServiceDock } from "@/components/maps/MapServiceDock";
+import { LocationPickerSheet } from "@/components/location/LocationPickerSheet";
 import { PaymentMethodSelector } from "@/components/payment/PaymentMethodSelector";
 import { MapFirstPage } from "@/layouts/MapFirstPage";
 import { useLiveActorLocations } from "@/hooks/useLiveActorLocations";
@@ -21,7 +22,7 @@ import { useStreetRoute } from "@/hooks/useStreetRoute";
 import { calculateBookingEstimate } from "@/services/pricing";
 import { createCurrentLocationSuggestion } from "@/services/geocoding";
 import { useAppStore } from "@/store/useAppStore";
-import type { BookingDraft, ServiceType } from "@/types/domain";
+import type { AddressSuggestion, BookingDraft, ServiceType } from "@/types/domain";
 import { formatCurrency, formatDistance } from "@/utils/format";
 
 const fallbackFare: Record<ServiceType, number> = {
@@ -35,6 +36,7 @@ export function BookingPage() {
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width: 767px)");
   const [mobileStep, setMobileStep] = useState<BookingMobileStep>("location");
+  const [pickerTarget, setPickerTarget] = useState<"pickup" | "destination" | null>(null);
   const bookingDraft = useAppStore((state) => state.bookingDraft);
   const updateBookingDraft = useAppStore((state) => state.updateBookingDraft);
   const addRecentLocation = useAppStore((state) => state.addRecentLocation);
@@ -111,6 +113,15 @@ export function BookingPage() {
 
   const canConfirm = Boolean(bookingDraft.pickup && bookingDraft.destination && serviceType);
 
+  const confirmPickedLocation = (location: AddressSuggestion) => {
+    if (pickerTarget === "pickup") {
+      updateEstimate({ pickup: location });
+      return;
+    }
+
+    updateEstimate({ destination: location });
+  };
+
   const updateService = (nextService: ServiceType) => {
     updateEstimate({ serviceType: nextService });
 
@@ -143,6 +154,7 @@ export function BookingPage() {
             .join(", ") || bookingDraft.destination.label,
         lat: bookingDraft.destination.lat,
         lng: bookingDraft.destination.lng,
+        source: bookingDraft.destination.source,
         lastUsedAt: new Date().toISOString()
       });
     }
@@ -207,6 +219,11 @@ export function BookingPage() {
         showPaymentChip={false}
         showMainActions={false}
         minimal={isMobile}
+        onLocateMe={(coordinates) =>
+          updateEstimate({
+            pickup: createCurrentLocationSuggestion(coordinates.lat, coordinates.lng)
+          })
+        }
         onPrimaryAction={confirm}
         className="min-h-[100svh] lg:min-h-[calc(100vh-4rem)]"
       />
@@ -224,7 +241,9 @@ export function BookingPage() {
               destination={bookingDraft.destination}
               currentLat={actors.userLocation.lat}
               currentLng={actors.userLocation.lng}
+              onPickupPickOnMap={() => setPickerTarget("pickup")}
               onDestinationSelect={(destination) => updateEstimate({ destination })}
+              onDestinationPickOnMap={() => setPickerTarget("destination")}
               onContinue={() => setMobileStep("service")}
             />
           )}
@@ -273,12 +292,14 @@ export function BookingPage() {
               currentLng={actors.userLocation.lng}
               value={bookingDraft.pickup}
               onSelect={(pickup) => updateEstimate({ pickup })}
+              onPickOnMap={() => setPickerTarget("pickup")}
             />
             <AddressSearch
               label="Destinație"
               placeholder="Unde dorești să mergi?"
               value={bookingDraft.destination}
               onSelect={(destination) => updateEstimate({ destination })}
+              onPickOnMap={() => setPickerTarget("destination")}
             />
           </MapFloatingPanel>
 
@@ -329,6 +350,13 @@ export function BookingPage() {
           </MapBottomSheet>
         </>
       )}
+      <LocationPickerSheet
+        open={Boolean(pickerTarget)}
+        title={pickerTarget === "pickup" ? "Alege pickup" : "Alege destinația"}
+        initialLocation={pickerTarget === "pickup" ? bookingDraft.pickup : bookingDraft.destination}
+        onClose={() => setPickerTarget(null)}
+        onConfirm={confirmPickedLocation}
+      />
     </MapFirstPage>
   );
 }

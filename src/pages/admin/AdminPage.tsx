@@ -1,6 +1,8 @@
 import { BarChart3, Car, ClipboardList, Settings, Shield, Truck, Users } from "lucide-react";
+import { AppSplashScreen } from "@/components/splash/AppSplashScreen";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { useRoleSplash } from "@/hooks/useRoleSplash";
 
 const sections = [
   { label: "Utilizatori", value: "12.480", icon: Users },
@@ -12,6 +14,12 @@ const sections = [
 ];
 
 export function AdminPage() {
+  const showSplash = useRoleSplash("admin");
+
+  if (showSplash) {
+    return <AppSplashScreen role="admin" />;
+  }
+
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">

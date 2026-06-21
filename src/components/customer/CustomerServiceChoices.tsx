@@ -1,4 +1,4 @@
-import { Car, ShieldAlert, Sparkles, Truck } from "lucide-react";
+import { Car, CarFront, ShieldAlert, Sparkles, Truck, Wrench } from "lucide-react";
 import type { ServiceType } from "@/types/domain";
 import { cn } from "@/utils/cn";
 
@@ -19,7 +19,8 @@ const choices = [
     id: "premium",
     label: "Premium",
     helper: "Confort ridicat",
-    icon: Sparkles
+    icon: CarFront,
+    accentIcon: Sparkles
   },
   {
     id: "tow",
@@ -31,7 +32,8 @@ const choices = [
     id: "roadside",
     label: "Asistență rutieră",
     helper: "Pană, baterie, combustibil",
-    icon: ShieldAlert
+    icon: Wrench,
+    accentIcon: ShieldAlert
   }
 ] as const;
 
@@ -62,12 +64,17 @@ export function CustomerServiceChoices({
           type="button"
           onClick={() => handleSelect(choice.id)}
           className={cn(
-            "glass-panel flex min-h-24 flex-col items-start justify-between p-4 text-left transition-colors hover:bg-muted/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            "glass-panel group flex min-h-24 flex-col items-start justify-between rounded-3xl p-4 text-left transition-colors hover:bg-muted/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             choice.id === "roadside" && "border-primary/35"
           )}
         >
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/12 text-primary">
+          <span className="relative grid h-12 w-12 place-items-center rounded-2xl bg-primary/12 text-primary transition-transform group-active:scale-95">
             <choice.icon className="h-5 w-5" aria-hidden="true" />
+            {"accentIcon" in choice && choice.accentIcon && (
+              <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-background text-primary shadow-map-control">
+                <choice.accentIcon className="h-3 w-3" aria-hidden="true" />
+              </span>
+            )}
           </span>
           <span>
             <span className="block text-sm font-semibold">{choice.label}</span>

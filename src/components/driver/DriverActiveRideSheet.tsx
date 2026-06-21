@@ -1,5 +1,6 @@
 import { Banknote, Clock, MapPin, Phone, Route, XCircle } from "lucide-react";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
+import { NavigateToCustomerButton } from "@/components/navigation/NavigateToCustomerButton";
 import { Button } from "@/components/ui/button";
 import { getDriverStatusDescription, getDriverStatusLabel } from "@/services/driverWorkflow";
 import type { DriverActiveBooking, DriverWorkflowAction, DriverWorkflowStatus } from "@/types/domain";
@@ -26,6 +27,10 @@ export function DriverActiveRideSheet({
   onPrimaryAction,
   onCancelRide
 }: DriverActiveRideSheetProps) {
+  const navigatesToDestination = ["trip_started", "en_route_to_destination", "arrived_at_destination"].includes(status);
+  const navigationCoordinates = navigatesToDestination ? booking.destination : booking.pickup;
+  const navigationLabel = navigatesToDestination ? booking.destinationAddress : booking.pickupAddress;
+
   return (
     <MapFloatingPanel className="space-y-4">
       <div className="flex items-start justify-between gap-3">
@@ -77,6 +82,10 @@ export function DriverActiveRideSheet({
           {primaryAction?.label ?? "Continuă"}
         </Button>
       </div>
+
+      <NavigateToCustomerButton coordinates={navigationCoordinates} label={navigationLabel} compact>
+        {navigatesToDestination ? "Navighează la destinație" : "Navighează la client"}
+      </NavigateToCustomerButton>
 
       <button
         type="button"

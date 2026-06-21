@@ -201,6 +201,53 @@
     background: hsl(var(--accent));
   }
 
+  .location-pin-icon {
+    background: transparent;
+    border: 0;
+  }
+
+  .location-pin-label {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    border-radius: 999px;
+    background: hsl(var(--background) / 0.92);
+    color: hsl(var(--foreground));
+    padding: 0.25rem 0.625rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    box-shadow: 0 14px 36px -24px rgb(15 23 42 / 0.58);
+    backdrop-filter: blur(18px);
+  }
+
+  .location-pin-dot {
+    position: absolute;
+    left: 50%;
+    top: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    transform: translateX(-50%) rotate(45deg);
+    border-radius: 50% 50% 50% 0;
+    background: hsl(var(--primary));
+    box-shadow: 0 12px 28px hsl(var(--foreground) / 0.22);
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+
+  .location-pin-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0.55rem;
+    border-radius: 999px;
+    background: hsl(var(--primary-foreground));
+  }
+
+  .location-pin-dot.is-dragging {
+    transform: translate(-50%, -0.45rem) rotate(45deg) scale(1.08);
+    box-shadow: 0 18px 36px hsl(var(--foreground) / 0.28);
+  }
+
   .map-pin-driver {
     background: #f59e0b;
   }

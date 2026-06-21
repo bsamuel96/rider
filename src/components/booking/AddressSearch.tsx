@@ -1,4 +1,4 @@
-import { MapPin, Navigation, X } from "lucide-react";
+import { MapPinned, MapPin, Navigation, X } from "lucide-react";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,9 +15,10 @@ type AddressSearchProps = {
   currentLat?: number;
   currentLng?: number;
   onSelect: (address: AddressSuggestion) => void;
+  onPickOnMap?: () => void;
 };
 
-export function AddressSearch({ label, placeholder, value, currentLat, currentLng, onSelect }: AddressSearchProps) {
+export function AddressSearch({ label, placeholder, value, currentLat, currentLng, onSelect, onPickOnMap }: AddressSearchProps) {
   const [query, setQuery] = useState(value?.label || "");
   const deferredQuery = useDeferredValue(query);
   const { data = [], isFetching, isError } = useAddressSearch(deferredQuery);
@@ -37,13 +38,23 @@ export function AddressSearch({ label, placeholder, value, currentLat, currentLn
   }, [currentLat, currentLng, data, label]);
 
   const handleSelect = (address: AddressSuggestion) => {
-    setQuery(address.label);
-    onSelect(address);
+    const source = address.id === "current-location" ? "current_location" : address.source || "search";
+    const nextAddress = {
+      ...address,
+      source
+    };
+    setQuery(nextAddress.label);
+    onSelect(nextAddress);
   };
 
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
+      <div className="flex items-center justify-between gap-2">
+        <Label>{label}</Label>
+        {value?.source === "map_pin" && (
+          <span className="rounded-full bg-primary/12 px-2 py-1 text-[11px] font-semibold text-primary">Pin pe hartă</span>
+        )}
+      </div>
       <div className="relative">
         <MapPin className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
         <Input
@@ -64,6 +75,18 @@ export function AddressSearch({ label, placeholder, value, currentLat, currentLn
           </button>
         )}
       </div>
+
+      {onPickOnMap && (
+        <button
+          type="button"
+          aria-label={`Alege pe hartă pentru ${label}`}
+          onClick={onPickOnMap}
+          className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-border/60 bg-background/60 px-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <MapPinned className="h-4 w-4 text-primary" aria-hidden="true" />
+          Alege pe hartă
+        </button>
+      )}
 
       <div className={cn("space-y-2", !query && "hidden")}>
         {isFetching && (

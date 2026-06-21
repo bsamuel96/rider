@@ -11,12 +11,15 @@ import { DriverStatusStrip } from "@/components/driver/DriverStatusStrip";
 import { DriverTripSheet } from "@/components/driver/DriverTripSheet";
 import { DriverWaitingSheet } from "@/components/driver/DriverWaitingSheet";
 import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
+import { AppSplashScreen } from "@/components/splash/AppSplashScreen";
 import { useDriverWorkflow } from "@/hooks/useDriverWorkflow";
+import { useRoleSplash } from "@/hooks/useRoleSplash";
 import { MapFirstPage } from "@/layouts/MapFirstPage";
 import type { BookingStatus, DriverWorkflowStatus } from "@/types/domain";
 
 export function DriverPage() {
   const workflow = useDriverWorkflow();
+  const showSplash = useRoleSplash("driver");
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const activeServiceType = workflow.activeBooking?.serviceType ?? workflow.activeOffer?.serviceType ?? "standard";
 
@@ -25,6 +28,10 @@ export function DriverPage() {
     workflow.cancelRide(reason);
     setCancelDialogOpen(false);
   };
+
+  if (showSplash) {
+    return <AppSplashScreen role="driver" />;
+  }
 
   return (
     <MapFirstPage bottomSafeArea={false}>

@@ -13,6 +13,12 @@ type ProfileRow = {
   registration_status: string | null;
   theme: string | null;
   preferred_payment_method?: string | null;
+  emergency_contact_name?: string | null;
+  emergency_contact_phone?: string | null;
+  language?: string | null;
+  default_address?: string | null;
+  home_address?: string | null;
+  work_address?: string | null;
 };
 
 export function mapProfileRow(row: ProfileRow): Profile {
@@ -27,7 +33,13 @@ export function mapProfileRow(row: ProfileRow): Profile {
     activeInstance: (row.active_instance || "customer") as AuthInstance,
     registrationStatus: (row.registration_status || "active") as RegistrationStatus,
     theme: (row.theme || "system") as ThemePreference,
-    preferredPaymentMethod: row.preferred_payment_method === "card" ? "card" : "cash"
+    preferredPaymentMethod: row.preferred_payment_method === "card" ? "card" : "cash",
+    emergencyContactName: row.emergency_contact_name || undefined,
+    emergencyContactPhone: row.emergency_contact_phone || undefined,
+    language: row.language || undefined,
+    defaultAddress: row.default_address || undefined,
+    homeAddress: row.home_address || undefined,
+    workAddress: row.work_address || undefined
   };
 }
 

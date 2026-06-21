@@ -9,7 +9,8 @@ import type {
   PaymentMethod,
   Profile,
   RecentLocation,
-  ThemePreference
+  ThemePreference,
+  VehicleProfile
 } from "@/types/domain";
 
 type AuthStatus = "anonymous" | "authenticated";
@@ -17,6 +18,7 @@ const DEMO_PROFILE_STORAGE_KEY = "rider-demo-profile";
 const DISMISSED_CUSTOMER_NOTIFICATIONS_KEY = "rider-dismissed-customer-notifications";
 const RECENT_LOCATIONS_STORAGE_KEY = "rider-recent-locations";
 const PREFERRED_PAYMENT_STORAGE_KEY = "rider-preferred-payment-method";
+const VEHICLE_PROFILE_STORAGE_KEY = "rider-demo-vehicle-profile";
 
 const defaultCustomerNotifications: CustomerNotification[] = [
   {
@@ -109,6 +111,7 @@ type AppState = {
   dismissedCustomerNotificationIds: string[];
   recentLocations: RecentLocation[];
   preferredPaymentMethod: PaymentMethod;
+  vehicleProfile: VehicleProfile | null;
   setProfile: (profile: Profile | null) => void;
   setActiveInstance: (instance: AuthInstance) => void;
   setSessionLoading: (loading: boolean) => void;
@@ -116,6 +119,8 @@ type AppState = {
   hydrateSession: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (profile: Partial<Profile>) => void;
+  updateProfileDetails: (profile: Partial<Profile>) => void;
+  updateVehicleProfile: (vehicle: VehicleProfile) => void;
   setTheme: (theme: ThemePreference) => void;
   updateBookingDraft: (draft: Partial<BookingDraft>) => void;
   resetBookingDraft: () => void;
@@ -131,6 +136,7 @@ const persistedInstance = (localStorage.getItem("rider-last-auth-instance") as A
 const persistedDismissedCustomerNotifications = readJsonStorage<string[]>(DISMISSED_CUSTOMER_NOTIFICATIONS_KEY, []);
 const persistedRecentLocations = readJsonStorage<RecentLocation[]>(RECENT_LOCATIONS_STORAGE_KEY, []);
 const persistedPreferredPaymentMethod = readPreferredPaymentMethod();
+const persistedVehicleProfile = readJsonStorage<VehicleProfile | null>(VEHICLE_PROFILE_STORAGE_KEY, null);
 
 export const useAppStore = create<AppState>((set) => ({
   profile: null,
@@ -143,6 +149,7 @@ export const useAppStore = create<AppState>((set) => ({
   dismissedCustomerNotificationIds: persistedDismissedCustomerNotifications,
   recentLocations: persistedRecentLocations,
   preferredPaymentMethod: persistedPreferredPaymentMethod,
+  vehicleProfile: persistedVehicleProfile,
   notifications: [
     {
       id: "welcome",
@@ -222,6 +229,25 @@ export const useAppStore = create<AppState>((set) => ({
           }
         : null
     })),
+  updateProfileDetails: (profile) =>
+    set((state) => {
+      const nextProfile = state.profile
+        ? {
+            ...state.profile,
+            ...profile
+          }
+        : null;
+
+      persistDemoProfile(nextProfile);
+
+      return {
+        profile: nextProfile
+      };
+    }),
+  updateVehicleProfile: (vehicleProfile) => {
+    localStorage.setItem(VEHICLE_PROFILE_STORAGE_KEY, JSON.stringify(vehicleProfile));
+    set({ vehicleProfile });
+  },
   setTheme: (theme) => {
     localStorage.setItem("rider-theme", theme);
     set({ theme });

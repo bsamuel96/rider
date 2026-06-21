@@ -16,6 +16,12 @@ export type Database = {
           registration_status: string;
           theme: string;
           preferred_payment_method: string;
+          emergency_contact_name: string | null;
+          emergency_contact_phone: string | null;
+          language: string | null;
+          default_address: string | null;
+          home_address: string | null;
+          work_address: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -31,6 +37,12 @@ export type Database = {
           registration_status?: string;
           theme?: string;
           preferred_payment_method?: string;
+          emergency_contact_name?: string | null;
+          emergency_contact_phone?: string | null;
+          language?: string | null;
+          default_address?: string | null;
+          home_address?: string | null;
+          work_address?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -121,6 +133,9 @@ export type Database = {
           address: string;
           lat: number;
           lng: number;
+          source: string;
+          accuracy_meters: number | null;
+          raw_address: Json | null;
           created_at: string;
         };
         Insert: {
@@ -130,6 +145,9 @@ export type Database = {
           address: string;
           lat: number;
           lng: number;
+          source?: string;
+          accuracy_meters?: number | null;
+          raw_address?: Json | null;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["addresses"]["Insert"]>;
@@ -233,6 +251,20 @@ export type Database = {
           cash_status: string;
           currency: string;
           estimated_price: number;
+          speed_tier: string;
+          normal_price: number | null;
+          fast_price: number | null;
+          final_price: number | null;
+          fast_guarantee_deadline: string | null;
+          fast_guarantee_applied: boolean;
+          accepted_at: string | null;
+          operator_en_route_at: string | null;
+          operator_marked_arrived_at: string | null;
+          customer_confirmed_arrived_at: string | null;
+          operator_marked_solved_at: string | null;
+          customer_confirmed_solved_at: string | null;
+          completion_disputed_at: string | null;
+          completion_dispute_reason: string | null;
           created_at: string;
         };
         Insert: {
@@ -248,9 +280,103 @@ export type Database = {
           cash_status?: string;
           currency?: string;
           estimated_price?: number;
+          speed_tier?: string;
+          normal_price?: number | null;
+          fast_price?: number | null;
+          final_price?: number | null;
+          fast_guarantee_deadline?: string | null;
+          fast_guarantee_applied?: boolean;
+          accepted_at?: string | null;
+          operator_en_route_at?: string | null;
+          operator_marked_arrived_at?: string | null;
+          customer_confirmed_arrived_at?: string | null;
+          operator_marked_solved_at?: string | null;
+          customer_confirmed_solved_at?: string | null;
+          completion_disputed_at?: string | null;
+          completion_dispute_reason?: string | null;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["roadside_requests"]["Insert"]>;
+        Relationships: [];
+      };
+      fleet_organizations: {
+        Row: {
+          id: string;
+          name: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["fleet_organizations"]["Insert"]>;
+        Relationships: [];
+      };
+      fleets: {
+        Row: {
+          id: string;
+          organization_id: string;
+          name: string;
+          fleet_type: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organization_id: string;
+          name: string;
+          fleet_type: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["fleets"]["Insert"]>;
+        Relationships: [];
+      };
+      fleet_members: {
+        Row: {
+          id: string;
+          fleet_id: string;
+          user_id: string;
+          role: string;
+          status: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          fleet_id: string;
+          user_id: string;
+          role: string;
+          status?: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["fleet_members"]["Insert"]>;
+        Relationships: [];
+      };
+      fleet_vehicles: {
+        Row: {
+          id: string;
+          fleet_id: string;
+          owner_id: string | null;
+          vehicle_kind: string;
+          brand: string | null;
+          model: string | null;
+          plate_number: string | null;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          fleet_id: string;
+          owner_id?: string | null;
+          vehicle_kind: string;
+          brand?: string | null;
+          model?: string | null;
+          plate_number?: string | null;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["fleet_vehicles"]["Insert"]>;
         Relationships: [];
       };
       driver_locations: {
@@ -471,7 +597,12 @@ export type Database = {
           color: string | null;
           production_year: number | null;
           seats: number | null;
+          fuel_type: string | null;
           capacity_kg: number | null;
+          photo_url: string | null;
+          notes: string | null;
+          equipment: string | null;
+          service_types: string[];
           vehicle_status: string;
           created_at: string;
           updated_at: string;
@@ -489,7 +620,12 @@ export type Database = {
           color?: string | null;
           production_year?: number | null;
           seats?: number | null;
+          fuel_type?: string | null;
           capacity_kg?: number | null;
+          photo_url?: string | null;
+          notes?: string | null;
+          equipment?: string | null;
+          service_types?: string[];
           vehicle_status?: string;
           created_at?: string;
           updated_at?: string;

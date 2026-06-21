@@ -105,13 +105,15 @@ const serviceTypeOptions = [
 const registerSchema: Record<AuthInstance, z.ZodType> = {
   customer: customerRegisterSchema,
   driver: driverRegisterSchema,
-  roadside: roadsideRegisterSchema
+  roadside: roadsideRegisterSchema,
+  fleet_manager: customerRegisterSchema
 };
 
 const submitText: Record<AuthInstance, string> = {
   customer: "Continuă ca client",
   driver: "Continuă ca șofer",
-  roadside: "Continuă pentru tractare și asistență"
+  roadside: "Continuă pentru tractare și asistență",
+  fleet_manager: "Folosește demo Fleet Manager"
 };
 
 export function RegisterForm({ instance }: RegisterFormProps) {
@@ -135,6 +137,11 @@ export function RegisterForm({ instance }: RegisterFormProps) {
     setError(null);
 
     try {
+      if (instance === "fleet_manager") {
+        setError("Pentru Fleet Manager folosește butonul Demo Fleet Manager.");
+        return;
+      }
+
       const profile =
         instance === "customer"
           ? await signUpCustomer(values as unknown as CustomerRegisterValues)
