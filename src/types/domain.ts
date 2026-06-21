@@ -2,6 +2,8 @@ export type AuthInstance = "customer" | "driver" | "roadside" | "fleet_manager";
 
 export type UserRole = "client" | "driver" | "roadside_operator" | "fleet_manager" | "admin";
 
+export type FleetScope = "transport" | "roadside" | "both";
+
 export type RegistrationStatus = "draft" | "pending_review" | "active" | "suspended" | "rejected";
 
 export type ThemePreference = "light" | "dark" | "system";
@@ -80,7 +82,62 @@ export type RoadsideRequest = {
 
 export type FleetType = "transport" | "roadside";
 
-export type FleetVehicleKind = "standard_car" | "premium_car" | "tow_truck" | "service_van" | "utility_vehicle";
+export type TransportVehicleType = "standard_car" | "premium_car";
+
+export type RoadsideVehicleType = "tow_truck" | "service_van" | "utility_vehicle" | "motorcycle";
+
+export type FleetVehicleKind = TransportVehicleType | RoadsideVehicleType;
+
+export type TransportFleetStats = {
+  onlineDrivers: number;
+  busyDrivers: number;
+  offlineDrivers: number;
+  pendingApprovalDrivers: number;
+  activeCars: number;
+  activeStandardCars: number;
+  activePremiumCars: number;
+  vehiclesInMaintenance: number;
+  vehiclesPendingReview: number;
+  ridesInProgress: number;
+  ridesSearchingDriver: number;
+  ridesToday: number;
+  completedRidesToday: number;
+  cancelledRidesToday: number;
+  grossEarningsToday: number;
+  cashEarningsToday: number;
+  cardEarningsToday: number;
+  averageFare: number;
+};
+
+export type RoadsideFleetStats = {
+  onlineOperators: number;
+  busyOperators: number;
+  offlineOperators: number;
+  pendingReviewOperators: number;
+  activeTowTrucks: number;
+  activeServiceVans: number;
+  vehiclesInMaintenance: number;
+  vehiclesPendingReview: number;
+  activeRequests: number;
+  newRequests: number;
+  acceptedRequests: number;
+  operatorsEnRoute: number;
+  arrivalConfirmationsPending: number;
+  issueInProgress: number;
+  solvedConfirmationsPending: number;
+  disputedRequests: number;
+  fastRequestsActive: number;
+  fastRequestsWithinGuarantee: number;
+  fastRequestsAtRisk: number;
+  guaranteesAppliedToday: number;
+  averageArrivalMinutes: number;
+  grossEarningsToday: number;
+  normalRequestsRevenue: number;
+  fastRequestsRevenue: number;
+  guaranteeDiscountsApplied: number;
+  cashEarningsToday: number;
+  cardEarningsToday: number;
+};
 
 export type Coordinates = {
   lat: number;
@@ -115,6 +172,7 @@ export type Profile = {
   avatarUrl?: string;
   role: UserRole;
   activeInstance?: AuthInstance;
+  fleetScope?: FleetScope;
   registrationStatus: RegistrationStatus;
   theme: ThemePreference;
   preferredPaymentMethod?: PaymentMethod;

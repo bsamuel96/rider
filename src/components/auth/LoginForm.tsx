@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 import { signInWithRole } from "@/services/auth";
 import { INSTANCE_LABELS } from "@/services/roleRedirect";
 import { isSupabaseConfigured, supabase } from "@/services/supabase";
@@ -95,10 +96,10 @@ export function LoginForm({ instance }: LoginFormProps) {
 
       {error && <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
 
-      <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
+      <LoadingButton type="submit" className="w-full" size="lg" loading={form.formState.isSubmitting} loadingLabel="Se conectează...">
         <LogIn className="h-4 w-4" />
         {buttonText[instance]}
-      </Button>
+      </LoadingButton>
 
       <div className="grid gap-2">
         {isSupabaseConfigured && (
@@ -107,7 +108,13 @@ export function LoginForm({ instance }: LoginFormProps) {
             Continuă cu Google
           </Button>
         )}
-        <Button type="button" variant="ghost" onClick={sendOtp} disabled={!isSupabaseConfigured}>
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={sendOtp}
+          disabled={!isSupabaseConfigured}
+          title={!isSupabaseConfigured ? "OTP este disponibil după configurarea Supabase Auth." : undefined}
+        >
           <MessageSquareText className="h-4 w-4" />
           OTP telefon pentru {INSTANCE_LABELS[instance]}
         </Button>

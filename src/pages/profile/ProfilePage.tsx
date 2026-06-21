@@ -20,6 +20,7 @@ export function ProfilePage() {
             ? "fleet_manager"
             : "client",
     activeInstance,
+    fleetScope: activeInstance === "fleet_manager" ? "both" : undefined,
     registrationStatus: "active",
     theme: "system",
     preferredPaymentMethod: "cash"

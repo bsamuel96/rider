@@ -23,6 +23,7 @@ function createLocalLoginProfile(instance: AuthInstance): Profile {
             : "Operator Roadside Demo",
     role,
     activeInstance: instance,
+    fleetScope: instance === "fleet_manager" ? "both" : undefined,
     registrationStatus: "active",
     theme: useAppStore.getState().theme
   };

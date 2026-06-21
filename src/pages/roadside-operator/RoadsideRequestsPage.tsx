@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { CheckCircle2, MapPin } from "lucide-react";
 import { NavigateToCustomerButton } from "@/components/navigation/NavigateToCustomerButton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/useToast";
 import { DEFAULT_CENTER } from "@/utils/constants";
 
 const requests = [
@@ -23,6 +26,18 @@ const requests = [
 ];
 
 export function RoadsideRequestsPage() {
+  const { toast } = useToast();
+  const [acceptedIds, setAcceptedIds] = useState<string[]>([]);
+
+  const acceptRequest = (requestId: string, label: string) => {
+    setAcceptedIds((current) => Array.from(new Set([...current, requestId])));
+    toast({
+      title: "Solicitare acceptată",
+      description: `${label} a fost preluată în demo.`,
+      tone: "success"
+    });
+  };
+
   return (
     <div className="mx-auto max-w-5xl space-y-5">
       <div>
@@ -35,14 +50,15 @@ export function RoadsideRequestsPage() {
             <span className="flex items-center gap-2 text-sm font-semibold">
               <MapPin className="h-4 w-4 text-primary" />
               {request.label}
+              {acceptedIds.includes(request.id) && <Badge variant="secondary">acceptată</Badge>}
             </span>
             <div className="flex flex-col gap-2 sm:flex-row">
               <NavigateToCustomerButton coordinates={request.coordinates} label={request.label} compact>
                 Navighează la client
               </NavigateToCustomerButton>
-              <Button size="sm">
+              <Button size="sm" onClick={() => acceptRequest(request.id, request.label)} disabled={acceptedIds.includes(request.id)}>
                 <CheckCircle2 className="h-4 w-4" />
-                Acceptă
+                {acceptedIds.includes(request.id) ? "Acceptată" : "Acceptă"}
               </Button>
             </div>
           </Card>

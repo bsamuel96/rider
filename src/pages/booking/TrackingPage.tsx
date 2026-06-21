@@ -10,6 +10,7 @@ import { useLiveActorLocations } from "@/hooks/useLiveActorLocations";
 import { usePaymentState } from "@/hooks/usePaymentState";
 import { useRoadsideGuarantee } from "@/hooks/useRoadsideGuarantee";
 import { useStreetRoute } from "@/hooks/useStreetRoute";
+import { useToast } from "@/hooks/useToast";
 import { useAppStore } from "@/store/useAppStore";
 import type { BookingStatus, Coordinates, ServiceType } from "@/types/domain";
 import { STATUS_LABELS } from "@/utils/constants";
@@ -31,6 +32,7 @@ const actionByStatus: Record<BookingStatus, string> = {
 export function TrackingPage() {
   const draft = useAppStore((state) => state.bookingDraft);
   const payment = usePaymentState();
+  const { toast } = useToast();
   const [statusIndex, setStatusIndex] = useState(0);
   const serviceType: ServiceType = draft.serviceType || "standard";
   const isRoadsideService = serviceType === "tow" || serviceType === "roadside";
@@ -111,7 +113,7 @@ export function TrackingPage() {
         className="min-h-[100svh] lg:min-h-[calc(100vh-4rem)]"
       />
 
-      <MapBottomSheet className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-[540] max-h-[min(50svh,430px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:right-5 md:w-[380px]">
+      <MapBottomSheet className="absolute inset-x-3 bottom-[var(--floating-bottom-offset)] z-[540] max-h-[min(50svh,430px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:right-5 md:w-[380px]">
         {currentStatus === "completed" ? (
           <MapRatingPanel roadside={isRoadsideService} />
         ) : (
@@ -133,9 +135,16 @@ export function TrackingPage() {
             </div>
             <button
               type="button"
-              className="grid h-11 w-11 place-items-center rounded-xl border bg-background/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="grid h-11 w-11 place-items-center rounded-xl border bg-background/70 transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Sună operatorul"
               title="Sună operatorul"
+              onClick={() =>
+                toast({
+                  title: isRoadsideService ? "Operator notificat în demo" : "Șofer notificat în demo",
+                  description: "În producție, aici se va iniția apelul.",
+                  tone: "success"
+                })
+              }
             >
               <Phone className="h-4 w-4" aria-hidden="true" />
             </button>

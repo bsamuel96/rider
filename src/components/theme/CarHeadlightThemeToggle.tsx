@@ -24,7 +24,7 @@ export function CarHeadlightThemeToggle({ floating, onToggle }: CarHeadlightThem
         onToggle?.(nextTheme);
       }}
       className={cn(
-        "map-glass-control relative grid h-11 w-11 place-items-center overflow-hidden text-foreground transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "map-glass-control relative grid h-11 w-11 place-items-center overflow-hidden text-foreground transition-all duration-150 hover:bg-muted/80 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         floating && "map-layer-control"
       )}
     >

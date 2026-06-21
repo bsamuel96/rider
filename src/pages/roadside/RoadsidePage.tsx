@@ -284,7 +284,7 @@ export function RoadsidePage() {
         className="min-h-[100svh] lg:min-h-[calc(100vh-4rem)]"
       />
 
-      <MapBottomSheet className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-[540] max-h-[min(68svh,640px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:left-5 md:w-[440px] md:rounded-3xl">
+      <MapBottomSheet className="absolute inset-x-3 bottom-[var(--floating-bottom-offset)] z-[540] max-h-[min(68svh,640px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:left-5 md:w-[440px] md:rounded-3xl">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground">

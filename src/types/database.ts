@@ -13,6 +13,7 @@ export type Database = {
           avatar_url: string | null;
           role: string;
           active_instance: string;
+          fleet_scope: string | null;
           registration_status: string;
           theme: string;
           preferred_payment_method: string;
@@ -34,6 +35,7 @@ export type Database = {
           avatar_url?: string | null;
           role?: string;
           active_instance?: string;
+          fleet_scope?: string | null;
           registration_status?: string;
           theme?: string;
           preferred_payment_method?: string;
@@ -356,7 +358,9 @@ export type Database = {
           id: string;
           fleet_id: string;
           owner_id: string | null;
+          fleet_type: string;
           vehicle_kind: string;
+          vehicle_type: string;
           brand: string | null;
           model: string | null;
           plate_number: string | null;
@@ -368,7 +372,9 @@ export type Database = {
           id?: string;
           fleet_id: string;
           owner_id?: string | null;
+          fleet_type?: string;
           vehicle_kind: string;
+          vehicle_type?: string;
           brand?: string | null;
           model?: string | null;
           plate_number?: string | null;

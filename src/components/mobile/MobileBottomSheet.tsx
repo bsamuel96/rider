@@ -16,7 +16,7 @@ export function MobileBottomSheet({ children, size = "medium", className }: Mobi
   return (
     <section
       className={cn(
-        "absolute inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-[540] overflow-y-auto rounded-t-[2rem] border border-border/60 bg-background/86 px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 shadow-floating backdrop-blur-2xl md:hidden",
+        "absolute inset-x-3 bottom-[var(--floating-bottom-offset)] z-[540] overflow-y-auto rounded-t-[2rem] border border-border/60 bg-background/86 px-4 pb-[calc(1rem+var(--safe-bottom))] pt-4 shadow-floating backdrop-blur-2xl md:hidden",
         sizeClasses[size],
         className
       )}

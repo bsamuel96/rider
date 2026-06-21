@@ -304,7 +304,7 @@ export function LiveMobilityMap({
       )}
 
       {shouldShowBottomOverlay && (
-      <div className="pointer-events-none absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-[540] space-y-2 md:inset-x-auto md:bottom-5 md:left-5 md:w-[420px]">
+      <div className="pointer-events-none absolute inset-x-3 bottom-[var(--floating-bottom-offset)] z-[540] space-y-2 md:inset-x-auto md:bottom-5 md:left-5 md:w-[420px]">
         <div className="pointer-events-auto flex flex-wrap gap-2">
           <MapEtaChip
             label={hasRoadsideActor ? "Echipaj" : "Șofer"}
@@ -349,8 +349,8 @@ export function LiveMobilityMap({
                       {paymentMethod === "cash" ? `Cash · ${formatCurrency(fareEstimate)}` : `Card · ${formatCurrency(fareEstimate)}`}
                     </p>
                   </div>
-                  {activeRole !== "customer" && (
-                    <MapFloatingButton aria-label="Sună clientul" title="Sună clientul">
+                  {activeRole !== "customer" && onSecondaryAction && (
+                    <MapFloatingButton aria-label="Sună clientul" title="Sună clientul" onClick={onSecondaryAction}>
                       <Phone className="h-4 w-4" />
                     </MapFloatingButton>
                   )}
@@ -366,11 +366,11 @@ export function LiveMobilityMap({
                   >
                     {primaryActionLabel}
                   </button>
-                  {secondaryActionLabel && (
+                  {secondaryActionLabel && onSecondaryAction && (
                     <button
                       type="button"
                       onClick={onSecondaryAction}
-                      className="min-h-12 rounded-xl border bg-background/70 px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="min-h-12 rounded-xl border bg-background/70 px-4 text-sm font-semibold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       {secondaryActionLabel}
                     </button>

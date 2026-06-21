@@ -1,10 +1,12 @@
 import type { LucideIcon } from "lucide-react";
 import { Bell, LogOut } from "lucide-react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AppLogo } from "@/components/brand/AppLogo";
+import { MobileLayoutDebug } from "@/components/dev/MobileLayoutDebug";
 import { CarHeadlightThemeToggle } from "@/components/theme/CarHeadlightThemeToggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageTransition } from "@/components/ui/PageTransition";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import { useAppStore } from "@/store/useAppStore";
@@ -21,6 +23,7 @@ type RoleShellFrameProps = {
   homePath: string;
   profilePath?: string;
   navItems: RoleNavItem[];
+  mobileNavItems?: RoleNavItem[];
   mapFirst?: boolean;
 };
 
@@ -29,14 +32,17 @@ export function RoleShellFrame({
   homePath,
   profilePath = `${homePath}/profile`,
   navItems,
+  mobileNavItems,
   mapFirst = false
 }: RoleShellFrameProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const online = useOnlineStatus();
   const profile = useAppStore((state) => state.profile);
   const notifications = useAppStore((state) => state.notifications);
   const logout = useAppStore((state) => state.logout);
   const unreadCount = notifications.filter((notification) => !notification.read).length;
+  const bottomNavItems = mobileNavItems || navItems;
   useRealtimeNotifications();
 
   const exit = async () => {
@@ -101,7 +107,9 @@ export function RoleShellFrame({
       </header>
 
       <main className={cn(mapFirst ? "pb-0 pt-0" : "container pb-24 pt-5 lg:pb-8")}>
-        <Outlet />
+        <PageTransition pageKey={location.pathname}>
+          <Outlet />
+        </PageTransition>
       </main>
 
       <nav
@@ -110,9 +118,9 @@ export function RoleShellFrame({
       >
         <div
           className="glass-dock mx-auto grid max-w-md gap-1 p-1"
-          style={{ gridTemplateColumns: `repeat(${Math.min(navItems.length, 5)}, minmax(0, 1fr))` }}
+          style={{ gridTemplateColumns: `repeat(${Math.min(bottomNavItems.length, 5)}, minmax(0, 1fr))` }}
         >
-          {navItems.slice(0, 5).map((item) => (
+          {bottomNavItems.slice(0, 5).map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -130,6 +138,7 @@ export function RoleShellFrame({
           ))}
         </div>
       </nav>
+      <MobileLayoutDebug />
     </div>
   );
 }

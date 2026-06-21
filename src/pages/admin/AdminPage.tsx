@@ -1,16 +1,17 @@
 import { BarChart3, Car, ClipboardList, Settings, Shield, Truck, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 import { AppSplashScreen } from "@/components/splash/AppSplashScreen";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useRoleSplash } from "@/hooks/useRoleSplash";
 
 const sections = [
-  { label: "Utilizatori", value: "12.480", icon: Users },
-  { label: "Șoferi", value: "428", icon: Car },
-  { label: "Vehicule", value: "512", icon: Truck },
-  { label: "Comenzi", value: "38.1k", icon: ClipboardList },
-  { label: "Roadside", value: "1.204", icon: Shield },
-  { label: "Setări", value: "Active", icon: Settings }
+  { label: "Utilizatori", value: "12.480", icon: Users, to: "/admin/users" },
+  { label: "Șoferi", value: "428", icon: Car, to: "/admin/drivers" },
+  { label: "Vehicule", value: "512", icon: Truck, to: "/admin/vehicles" },
+  { label: "Comenzi", value: "38.1k", icon: ClipboardList, to: "/admin/bookings" },
+  { label: "Roadside", value: "1.204", icon: Shield, to: "/admin/roadside-requests" },
+  { label: "Setări", value: "Active", icon: Settings, to: "/admin/settings" }
 ];
 
 export function AdminPage() {
@@ -32,17 +33,23 @@ export function AdminPage() {
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {sections.map((section) => (
-          <Card key={section.label} className="p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm text-muted-foreground">{section.label}</p>
-                <p className="mt-2 text-2xl font-semibold">{section.value}</p>
+          <Link
+            key={section.label}
+            to={section.to}
+            className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Card className="p-5 transition-all duration-150 hover:-translate-y-0.5 hover:shadow-floating active:scale-[0.98]">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">{section.label}</p>
+                  <p className="mt-2 text-2xl font-semibold">{section.value}</p>
+                </div>
+                <span className="grid h-11 w-11 place-items-center rounded-lg bg-secondary">
+                  <section.icon className="h-5 w-5" aria-hidden="true" />
+                </span>
               </div>
-              <span className="grid h-11 w-11 place-items-center rounded-lg bg-secondary">
-                <section.icon className="h-5 w-5" />
-              </span>
-            </div>
-          </Card>
+            </Card>
+          </Link>
         ))}
       </div>
 

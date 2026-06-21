@@ -1,5 +1,5 @@
 import { isSupabaseConfigured, supabase } from "@/services/supabase";
-import type { AuthInstance, Profile, RegistrationStatus, ThemePreference, UserRole } from "@/types/domain";
+import type { AuthInstance, FleetScope, Profile, RegistrationStatus, ThemePreference, UserRole } from "@/types/domain";
 
 type ProfileRow = {
   id: string;
@@ -10,6 +10,7 @@ type ProfileRow = {
   avatar_url: string | null;
   role: string;
   active_instance: string | null;
+  fleet_scope?: string | null;
   registration_status: string | null;
   theme: string | null;
   preferred_payment_method?: string | null;
@@ -31,6 +32,7 @@ export function mapProfileRow(row: ProfileRow): Profile {
     avatarUrl: row.avatar_url || undefined,
     role: (row.role || "client") as UserRole,
     activeInstance: (row.active_instance || "customer") as AuthInstance,
+    fleetScope: (row.fleet_scope || undefined) as FleetScope | undefined,
     registrationStatus: (row.registration_status || "active") as RegistrationStatus,
     theme: (row.theme || "system") as ThemePreference,
     preferredPaymentMethod: row.preferred_payment_method === "card" ? "card" : "cash",

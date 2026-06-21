@@ -12,12 +12,14 @@ import { AppSplashScreen } from "@/components/splash/AppSplashScreen";
 import { MapFirstPage } from "@/layouts/MapFirstPage";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useRoleSplash } from "@/hooks/useRoleSplash";
+import { useToast } from "@/hooks/useToast";
 import type { BookingStatus, CashStatus, Coordinates, RoadsideRequestStatus } from "@/types/domain";
 import { estimateEtaMinutes, haversineDistanceKm } from "@/utils/geo";
 
 export function RoadsideOperatorDashboardPage() {
   const { position } = useGeolocation();
   const showSplash = useRoleSplash("roadside");
+  const { toast } = useToast();
   const [online, setOnline] = useState(true);
   const [step, setStep] = useState(0);
   const [requestStatus, setRequestStatus] = useState<RoadsideRequestStatus>("searching");
@@ -72,6 +74,13 @@ export function RoadsideOperatorDashboardPage() {
     }
   };
 
+  const contactCustomer = () =>
+    toast({
+      title: "Client notificat în demo",
+      description: "În producție, aici se va iniția apelul către client.",
+      tone: "success"
+    });
+
   if (showSplash) {
     return <AppSplashScreen role="roadside" />;
   }
@@ -100,6 +109,7 @@ export function RoadsideOperatorDashboardPage() {
         secondaryActionLabel={online ? "Sună clientul" : undefined}
         completed={currentStatus === "completed"}
         onPrimaryAction={advance}
+        onSecondaryAction={contactCustomer}
         className="min-h-[100svh] lg:min-h-[calc(100vh-4rem)]"
       />
 
@@ -119,13 +129,13 @@ export function RoadsideOperatorDashboardPage() {
       </MapFloatingPanel>
 
       {cashStatus !== "collected" && step >= 3 && (
-        <div className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+16.5rem)] z-[520] md:left-auto md:right-5 md:w-[360px]">
+        <div className="absolute inset-x-3 bottom-[calc(var(--floating-bottom-offset)+11rem)] z-[520] md:left-auto md:right-5 md:w-[360px]">
           <CashCollectionPanel amount={180} status={cashStatus} onCollected={() => setCashStatus("collected")} />
         </div>
       )}
 
       {(cashStatus === "collected" || step < 3) && (
-        <MapFloatingPanel className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+16.5rem)] z-[510] space-y-3 md:hidden">
+        <MapFloatingPanel className="absolute inset-x-3 bottom-[calc(var(--floating-bottom-offset)+11rem)] z-[510] space-y-3 md:hidden">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground">
@@ -136,7 +146,7 @@ export function RoadsideOperatorDashboardPage() {
                 <p className="text-xs text-muted-foreground">Client la ~{etaToClientMinutes} min · cash 180 RON</p>
               </div>
             </div>
-            <MapFloatingButton aria-label="Sună clientul" title="Sună clientul">
+            <MapFloatingButton aria-label="Sună clientul" title="Sună clientul" onClick={contactCustomer}>
               <Phone className="h-4 w-4" aria-hidden="true" />
             </MapFloatingButton>
           </div>

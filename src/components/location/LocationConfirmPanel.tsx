@@ -20,7 +20,7 @@ export function LocationConfirmPanel({
   onConfirm
 }: LocationConfirmPanelProps) {
   return (
-    <section className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-[620] rounded-3xl border border-border/60 bg-background/90 p-4 shadow-floating backdrop-blur-2xl md:bottom-5 md:left-1/2 md:right-auto md:w-[440px] md:-translate-x-1/2">
+    <section className="absolute inset-x-3 bottom-[var(--floating-bottom-offset)] z-[620] rounded-3xl border border-border/60 bg-background/90 p-4 shadow-floating backdrop-blur-2xl md:bottom-5 md:left-1/2 md:right-auto md:w-[440px] md:-translate-x-1/2">
       <div className="flex items-start gap-3">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-primary/12 text-primary">
           <MapPin className="h-5 w-5" aria-hidden="true" />

@@ -47,7 +47,7 @@ export function DriverRideDetailPage() {
 
       <DriverStatusStrip status="en_route_to_pickup" todayEarnings={0} rating={4.96} online />
 
-      <div className="pointer-events-none absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-[560] md:left-5 md:right-auto md:bottom-5 md:w-[420px]">
+      <div className="pointer-events-none absolute inset-x-3 bottom-[var(--floating-bottom-offset)] z-[560] md:left-5 md:right-auto md:bottom-5 md:w-[420px]">
         <div className="pointer-events-auto">
           <DriverActiveRideSheet
             booking={booking}

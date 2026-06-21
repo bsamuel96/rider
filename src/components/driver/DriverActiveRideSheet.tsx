@@ -2,6 +2,7 @@ import { Banknote, Clock, MapPin, Phone, Route, XCircle } from "lucide-react";
 import { MapFloatingPanel } from "@/components/maps/MapFloatingPanel";
 import { NavigateToCustomerButton } from "@/components/navigation/NavigateToCustomerButton";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/useToast";
 import { getDriverStatusDescription, getDriverStatusLabel } from "@/services/driverWorkflow";
 import type { DriverActiveBooking, DriverWorkflowAction, DriverWorkflowStatus } from "@/types/domain";
 import { formatCurrency, formatDistance } from "@/utils/format";
@@ -27,6 +28,7 @@ export function DriverActiveRideSheet({
   onPrimaryAction,
   onCancelRide
 }: DriverActiveRideSheetProps) {
+  const { toast } = useToast();
   const navigatesToDestination = ["trip_started", "en_route_to_destination", "arrived_at_destination"].includes(status);
   const navigationCoordinates = navigatesToDestination ? booking.destination : booking.pickup;
   const navigationLabel = navigatesToDestination ? booking.destinationAddress : booking.pickupAddress;
@@ -74,7 +76,17 @@ export function DriverActiveRideSheet({
       </div>
 
       <div className="grid grid-cols-[1fr_1.5fr] gap-2">
-        <Button type="button" variant="outline">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() =>
+            toast({
+              title: "Apel demo inițiat",
+              description: `În demo, ${booking.customerName} a fost notificat că îl vei suna.`,
+              tone: "success"
+            })
+          }
+        >
           <Phone className="h-4 w-4" aria-hidden="true" />
           Sună
         </Button>

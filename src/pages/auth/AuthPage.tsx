@@ -1,4 +1,4 @@
-import { Building2, Car, ShieldCheck, UserRound } from "lucide-react";
+import { Building2, Car, ShieldCheck, UserCog, UserRound } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthRoleTabs } from "@/components/auth/AuthRoleTabs";
 import { LoginForm } from "@/components/auth/LoginForm";
@@ -55,6 +55,7 @@ const demoProfiles: Record<AuthInstance, Profile> = {
     fullName: "Fleet Manager Demo",
     role: "fleet_manager",
     activeInstance: "fleet_manager",
+    fleetScope: "both",
     registrationStatus: "active",
     theme: "system",
     preferredPaymentMethod: "cash"
@@ -76,6 +77,24 @@ export function AuthPage() {
   const enterDemo = (instance: AuthInstance) => {
     const profile = demoProfiles[instance];
     setActiveInstance(instance);
+    setProfile(profile);
+    navigate(getDashboardPathForRole(profile));
+  };
+
+  const enterAdminDemo = () => {
+    const profile: Profile = {
+      id: "demo-admin",
+      email: "admin@rider.demo",
+      phone: "+40 700 000 005",
+      username: "demo_admin",
+      fullName: "Admin Demo",
+      role: "admin",
+      activeInstance: activeInstance,
+      registrationStatus: "active",
+      theme: "system",
+      preferredPaymentMethod: "cash"
+    };
+
     setProfile(profile);
     navigate(getDashboardPathForRole(profile));
   };
@@ -120,24 +139,53 @@ export function AuthPage() {
           <CardContent>{mode === "login" ? <LoginForm instance={activeInstance} /> : <RegisterForm instance={activeInstance} />}</CardContent>
         </Card>
 
-        <Card className="mx-auto w-full max-w-2xl p-4">
-          <h2 className="text-sm font-semibold">Intră rapid în demo</h2>
-          <div className="mt-3 grid gap-2 sm:grid-cols-4">
-            <Button type="button" variant="outline" onClick={() => enterDemo("customer")}>
+        <Card className="mx-auto w-full max-w-5xl p-4 sm:p-5">
+          <h2 className="text-base font-semibold sm:text-lg">Intră rapid în demo</h2>
+          <div className="mt-4 grid grid-cols-[repeat(auto-fit,minmax(11.5rem,1fr))] gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-14 min-w-0 whitespace-normal rounded-2xl px-3 text-center text-sm leading-tight sm:min-h-16 sm:text-base"
+              onClick={() => enterDemo("customer")}
+            >
               <UserRound className="h-4 w-4" />
               Demo Client
             </Button>
-            <Button type="button" variant="outline" onClick={() => enterDemo("driver")}>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-14 min-w-0 whitespace-normal rounded-2xl px-3 text-center text-sm leading-tight sm:min-h-16 sm:text-base"
+              onClick={() => enterDemo("driver")}
+            >
               <Car className="h-4 w-4" />
               Demo Șofer
             </Button>
-            <Button type="button" variant="outline" onClick={() => enterDemo("roadside")}>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-14 min-w-0 whitespace-normal rounded-2xl px-3 text-center text-sm leading-tight sm:min-h-16 sm:text-base"
+              onClick={() => enterDemo("roadside")}
+            >
               <ShieldCheck className="h-4 w-4" />
               Demo Roadside
             </Button>
-            <Button type="button" variant="outline" onClick={() => enterDemo("fleet_manager")}>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-14 min-w-0 whitespace-normal rounded-2xl px-3 text-center text-sm leading-tight sm:min-h-16 sm:text-base"
+              onClick={() => enterDemo("fleet_manager")}
+            >
               <Building2 className="h-4 w-4" />
               Demo Fleet Manager
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-14 min-w-0 whitespace-normal rounded-2xl px-3 text-center text-sm leading-tight sm:min-h-16 sm:text-base"
+              onClick={enterAdminDemo}
+            >
+              <UserCog className="h-4 w-4" />
+              Demo Admin
             </Button>
           </div>
         </Card>

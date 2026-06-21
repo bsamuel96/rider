@@ -49,10 +49,13 @@ export function RoadsideForm({ onSubmit }: RoadsideFormProps) {
             <button
               type="button"
               key={issue.value}
+              aria-pressed={selectedIssue === issue.value}
               onClick={() => form.setValue("issueType", issue.value, { shouldValidate: true })}
               className={cn(
-                "h-11 rounded-xl border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                selectedIssue === issue.value ? "border-primary bg-primary text-primary-foreground" : "bg-background/55 hover:bg-muted/70"
+                "h-11 rounded-xl border px-3 text-sm font-semibold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                selectedIssue === issue.value
+                  ? "border-primary bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-md ring-2 ring-primary/30"
+                  : "border-border/60 bg-background/55 text-foreground hover:border-primary/45 hover:bg-muted/70"
               )}
             >
               {issue.label}

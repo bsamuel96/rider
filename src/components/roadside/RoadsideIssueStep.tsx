@@ -1,4 +1,4 @@
-import { CarFront, Fuel, KeyRound, ShieldAlert, Wrench, Zap } from "lucide-react";
+import { CarFront, CheckCircle2, Fuel, KeyRound, ShieldAlert, Wrench, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -57,20 +57,32 @@ export function RoadsideIssueStep({
         <p className="mt-1 text-xs text-muted-foreground">Alege opțiunea cea mai apropiată. Poți adăuga detalii scurte.</p>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        {issueOptions.map((issue) => (
-          <button
-            key={issue.value}
-            type="button"
-            onClick={() => onIssueChange(issue.value)}
-            className={cn(
-              "min-h-12 rounded-xl border border-border/60 bg-background/55 px-3 text-left text-xs font-semibold transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              issueType === issue.value && "border-primary bg-primary text-primary-foreground"
-            )}
-          >
-            <issue.icon className="mb-1 h-4 w-4" aria-hidden="true" />
-            {issue.label}
-          </button>
-        ))}
+        {issueOptions.map((issue) => {
+          const selected = issueType === issue.value;
+
+          return (
+            <button
+              key={issue.value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onIssueChange(issue.value)}
+              className={cn(
+                "relative min-h-16 overflow-hidden rounded-2xl border px-3 text-left text-sm font-semibold transition-all duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                selected
+                  ? "border-primary bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-floating ring-2 ring-primary/30"
+                  : "border-border/60 bg-background/60 text-foreground hover:border-primary/45 hover:bg-muted/70"
+              )}
+            >
+              {selected && (
+                <span className="absolute right-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-white/20 text-white">
+                  <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+                </span>
+              )}
+              <issue.icon className="mb-2 h-5 w-5" aria-hidden="true" />
+              <span className="block pr-6 leading-tight">{issue.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {mode === "tow" && (

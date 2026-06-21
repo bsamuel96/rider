@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { FleetScopeGuard } from "@/components/auth/FleetScopeGuard";
 import { ProfileRedirect } from "@/components/auth/ProfileRedirect";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { RoleBasedRedirect } from "@/components/auth/RoleBasedRedirect";
@@ -25,13 +26,20 @@ import { DriverPendingPage } from "@/pages/driver/DriverPendingPage";
 import { DriverRideDetailPage } from "@/pages/driver/DriverRideDetailPage";
 import { DriverRidesPage } from "@/pages/driver/DriverRidesPage";
 import { DriverVehiclePage } from "@/pages/driver/DriverVehiclePage";
-import { FleetAnalyticsPage } from "@/pages/fleet-manager/FleetAnalyticsPage";
-import { FleetJobsPage } from "@/pages/fleet-manager/FleetJobsPage";
-import { FleetManagerDashboardPage } from "@/pages/fleet-manager/FleetManagerDashboardPage";
-import { FleetPeoplePage } from "@/pages/fleet-manager/FleetPeoplePage";
-import { FleetVehiclesPage } from "@/pages/fleet-manager/FleetVehiclesPage";
-import { RoadsideFleetPage as FleetRoadsideFleetPage } from "@/pages/fleet-manager/RoadsideFleetPage";
-import { TransportFleetPage } from "@/pages/fleet-manager/TransportFleetPage";
+import { FleetManagerHomePage } from "@/pages/fleet-manager/FleetManagerHomePage";
+import { RoadsideAnalyticsPage } from "@/pages/fleet-manager/roadside/RoadsideAnalyticsPage";
+import { RoadsideEarningsPage } from "@/pages/fleet-manager/roadside/RoadsideEarningsPage";
+import { RoadsideFastSlaPage } from "@/pages/fleet-manager/roadside/RoadsideFastSlaPage";
+import { RoadsideFleetDashboardPage } from "@/pages/fleet-manager/roadside/RoadsideFleetDashboardPage";
+import { RoadsideOperatorsPage } from "@/pages/fleet-manager/roadside/RoadsideOperatorsPage";
+import { RoadsideRequestsPage as FleetRoadsideRequestsPage } from "@/pages/fleet-manager/roadside/RoadsideRequestsPage";
+import { RoadsideVehiclesPage as FleetRoadsideVehiclesPage } from "@/pages/fleet-manager/roadside/RoadsideVehiclesPage";
+import { TransportAnalyticsPage } from "@/pages/fleet-manager/transport/TransportAnalyticsPage";
+import { TransportDriversPage } from "@/pages/fleet-manager/transport/TransportDriversPage";
+import { TransportEarningsPage } from "@/pages/fleet-manager/transport/TransportEarningsPage";
+import { TransportFleetDashboardPage } from "@/pages/fleet-manager/transport/TransportFleetDashboardPage";
+import { TransportRidesPage } from "@/pages/fleet-manager/transport/TransportRidesPage";
+import { TransportVehiclesPage } from "@/pages/fleet-manager/transport/TransportVehiclesPage";
 import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { RoadsideOperatorDashboardPage } from "@/pages/roadside-operator/RoadsideOperatorDashboardPage";
 import { RoadsideOperatorPendingPage } from "@/pages/roadside-operator/RoadsideOperatorPendingPage";
@@ -130,15 +138,111 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <FleetManagerDashboardPage /> },
-      { path: "transport", element: <TransportFleetPage /> },
-      { path: "roadside", element: <FleetRoadsideFleetPage /> },
-      { path: "vehicles", element: <FleetVehiclesPage /> },
-      { path: "people", element: <FleetPeoplePage /> },
-      { path: "drivers", element: <FleetPeoplePage /> },
-      { path: "operators", element: <FleetPeoplePage /> },
-      { path: "jobs", element: <FleetJobsPage /> },
-      { path: "analytics", element: <FleetAnalyticsPage /> },
+      { index: true, element: <FleetManagerHomePage /> },
+      {
+        path: "transport",
+        element: (
+          <FleetScopeGuard scope="transport">
+            <TransportFleetDashboardPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "transport/vehicles",
+        element: (
+          <FleetScopeGuard scope="transport">
+            <TransportVehiclesPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "transport/drivers",
+        element: (
+          <FleetScopeGuard scope="transport">
+            <TransportDriversPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "transport/rides",
+        element: (
+          <FleetScopeGuard scope="transport">
+            <TransportRidesPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "transport/earnings",
+        element: (
+          <FleetScopeGuard scope="transport">
+            <TransportEarningsPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "transport/analytics",
+        element: (
+          <FleetScopeGuard scope="transport">
+            <TransportAnalyticsPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "roadside",
+        element: (
+          <FleetScopeGuard scope="roadside">
+            <RoadsideFleetDashboardPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "roadside/vehicles",
+        element: (
+          <FleetScopeGuard scope="roadside">
+            <FleetRoadsideVehiclesPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "roadside/operators",
+        element: (
+          <FleetScopeGuard scope="roadside">
+            <RoadsideOperatorsPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "roadside/requests",
+        element: (
+          <FleetScopeGuard scope="roadside">
+            <FleetRoadsideRequestsPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "roadside/fast-requests",
+        element: (
+          <FleetScopeGuard scope="roadside">
+            <RoadsideFastSlaPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "roadside/earnings",
+        element: (
+          <FleetScopeGuard scope="roadside">
+            <RoadsideEarningsPage />
+          </FleetScopeGuard>
+        )
+      },
+      {
+        path: "roadside/analytics",
+        element: (
+          <FleetScopeGuard scope="roadside">
+            <RoadsideAnalyticsPage />
+          </FleetScopeGuard>
+        )
+      },
       { path: "profile", element: <ProfilePage /> }
     ]
   },

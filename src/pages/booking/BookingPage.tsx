@@ -303,7 +303,7 @@ export function BookingPage() {
             />
           </MapFloatingPanel>
 
-          <MapBottomSheet className="absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.25rem)] z-[540] max-h-[min(48svh,420px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:right-5 md:w-[360px]">
+          <MapBottomSheet className="absolute inset-x-3 bottom-[var(--floating-bottom-offset)] z-[540] max-h-[min(48svh,420px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:right-5 md:w-[360px]">
             <div className="space-y-3">
               <MapServiceDock value={serviceType} onChange={updateService} />
               <PaymentMethodSelector

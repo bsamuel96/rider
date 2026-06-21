@@ -25,7 +25,11 @@
     --ring: 172 72% 32%;
     --radius: 0.5rem;
     --bottom-nav-height: 76px;
-    --home-safe-height: calc(100dvh - var(--bottom-nav-height) - env(safe-area-inset-bottom));
+    --mobile-sheet-gap: 12px;
+    --safe-bottom: env(safe-area-inset-bottom);
+    --safe-top: env(safe-area-inset-top);
+    --floating-bottom-offset: calc(var(--bottom-nav-height) + var(--safe-bottom) + var(--mobile-sheet-gap));
+    --home-safe-height: calc(100dvh - var(--bottom-nav-height) - var(--safe-bottom));
   }
 
   .dark {
@@ -78,6 +82,31 @@
 
   ::selection {
     background: hsl(var(--primary) / 0.22);
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  .animate-page-enter {
+    animation: page-enter 180ms ease-out both;
   }
 }
 

@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { CheckCircle2, FileWarning, PauseCircle, UserCheck, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/hooks/useToast";
 
 const approvalItems = [
   {
@@ -29,6 +31,18 @@ const approvalItems = [
 const sections = ["Șoferi în așteptare", "Operatori roadside în așteptare", "Vehicule în așteptare", "Documente expirate", "Documente respinse"];
 
 export function AdminApprovalsPage() {
+  const { toast } = useToast();
+  const [items, setItems] = useState(approvalItems);
+
+  const updateStatus = (email: string, status: string, message: string) => {
+    setItems((current) => current.map((item) => (item.email === email ? { ...item, status } : item)));
+    toast({
+      title: "Acțiune demo aplicată",
+      description: message,
+      tone: status === "approved" ? "success" : status === "rejected" ? "error" : "warning"
+    });
+  };
+
   return (
     <div className="mx-auto max-w-6xl space-y-5">
       <div>
@@ -47,7 +61,7 @@ export function AdminApprovalsPage() {
       </div>
 
       <div className="grid gap-3">
-        {approvalItems.map((item) => (
+        {items.map((item) => (
           <Card key={item.email} className="p-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
@@ -80,19 +94,37 @@ export function AdminApprovalsPage() {
                 </dl>
               </div>
               <div className="grid gap-2 sm:grid-cols-2 lg:w-72 lg:grid-cols-1">
-                <Button>
+                <Button
+                  type="button"
+                  onClick={() => updateStatus(item.email, "approved", `${item.name} a fost aprobat în demo.`)}
+                  disabled={item.status === "approved"}
+                >
                   <CheckCircle2 className="h-4 w-4" />
-                  Aprobă contul
+                  {item.status === "approved" ? "Aprobat" : "Aprobă contul"}
                 </Button>
-                <Button variant="outline">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    updateStatus(item.email, "needs_more_documents", `Am cerut documente suplimentare pentru ${item.name}.`)
+                  }
+                >
                   <FileWarning className="h-4 w-4" />
                   Cere documente suplimentare
                 </Button>
-                <Button variant="outline">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => updateStatus(item.email, "suspended", `${item.name} a fost suspendat în demo.`)}
+                >
                   <PauseCircle className="h-4 w-4" />
                   Suspendă
                 </Button>
-                <Button variant="destructive">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => updateStatus(item.email, "rejected", `Documentul pentru ${item.name} a fost respins.`)}
+                >
                   <XCircle className="h-4 w-4" />
                   Respinge documentul
                 </Button>
