@@ -12,6 +12,7 @@ type ProfileRow = {
   active_instance: string | null;
   registration_status: string | null;
   theme: string | null;
+  preferred_payment_method?: string | null;
 };
 
 export function mapProfileRow(row: ProfileRow): Profile {
@@ -25,7 +26,8 @@ export function mapProfileRow(row: ProfileRow): Profile {
     role: (row.role || "client") as UserRole,
     activeInstance: (row.active_instance || "customer") as AuthInstance,
     registrationStatus: (row.registration_status || "active") as RegistrationStatus,
-    theme: (row.theme || "system") as ThemePreference
+    theme: (row.theme || "system") as ThemePreference,
+    preferredPaymentMethod: row.preferred_payment_method === "card" ? "card" : "cash"
   };
 }
 

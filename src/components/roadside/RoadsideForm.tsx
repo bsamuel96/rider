@@ -14,11 +14,12 @@ const issueOptions: { value: RoadsideIssue; label: string }[] = [
   { value: "engine", label: "Motor" },
   { value: "accident", label: "Accident" },
   { value: "fuel", label: "Combustibil" },
+  { value: "locked_keys", label: "Chei blocate" },
   { value: "other", label: "Altceva" }
 ];
 
 const roadsideSchema = z.object({
-  issueType: z.enum(["flat_tire", "battery", "engine", "accident", "fuel", "other"]),
+  issueType: z.enum(["flat_tire", "battery", "engine", "accident", "fuel", "locked_keys", "other"]),
   description: z.string().min(6, "Adaugă câteva detalii pentru operator.")
 });
 

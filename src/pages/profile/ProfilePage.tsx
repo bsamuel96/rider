@@ -1,4 +1,5 @@
-import { CreditCard, Heart, Home, Mail, MapPin, Phone, UserRound } from "lucide-react";
+import { Heart, Home, Mail, MapPin, Phone, UserRound } from "lucide-react";
+import { PreferredPaymentMethod } from "@/components/profile/PreferredPaymentMethod";
 import { ThemePreference } from "@/components/profile/ThemePreference";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -70,11 +71,11 @@ export function ProfilePage() {
           </Card>
 
           <Card className="p-5">
-            <h2 className="font-semibold">Metode plată</h2>
-            <p className="mt-4 flex items-center gap-2 text-sm">
-              <CreditCard className="h-4 w-4 text-primary" />
-              Card principal pregătit
-            </p>
+            <h2 className="font-semibold">Metodă de plată preferată</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Această metodă va fi selectată implicit la următoarea comandă.</p>
+            <div className="mt-4">
+              <PreferredPaymentMethod />
+            </div>
           </Card>
         </div>
 

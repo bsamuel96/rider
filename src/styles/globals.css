@@ -24,6 +24,8 @@
     --input: 220 13% 87%;
     --ring: 172 72% 32%;
     --radius: 0.5rem;
+    --bottom-nav-height: 76px;
+    --home-safe-height: calc(100dvh - var(--bottom-nav-height) - env(safe-area-inset-bottom));
   }
 
   .dark {
@@ -147,6 +149,27 @@
 
   .map-layer-dialog {
     z-index: 700;
+  }
+
+  .customer-home {
+    display: grid;
+    grid-template-rows:
+      minmax(64px, 1fr)
+      minmax(64px, 1fr)
+      minmax(240px, 4fr)
+      minmax(64px, 1fr)
+      minmax(140px, 5fr);
+    gap: 0.75rem;
+    overflow: hidden;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
   .leaflet-container {

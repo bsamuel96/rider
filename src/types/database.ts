@@ -15,6 +15,7 @@ export type Database = {
           active_instance: string;
           registration_status: string;
           theme: string;
+          preferred_payment_method: string;
           created_at: string;
           updated_at: string;
         };
@@ -29,6 +30,7 @@ export type Database = {
           active_instance?: string;
           registration_status?: string;
           theme?: string;
+          preferred_payment_method?: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -131,6 +133,30 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["addresses"]["Insert"]>;
+        Relationships: [];
+      };
+      recent_locations: {
+        Row: {
+          id: string;
+          user_id: string;
+          label: string;
+          address: string;
+          lat: number;
+          lng: number;
+          last_used_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          label: string;
+          address: string;
+          lat: number;
+          lng: number;
+          last_used_at?: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["recent_locations"]["Insert"]>;
         Relationships: [];
       };
       bookings: {

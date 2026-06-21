@@ -14,7 +14,7 @@ import { OnboardingPage } from "@/pages/auth/OnboardingPage";
 import { BookingPage } from "@/pages/booking/BookingPage";
 import { TrackingPage } from "@/pages/booking/TrackingPage";
 import { CustomerAddressesPage } from "@/pages/customer/CustomerAddressesPage";
-import { CustomerDashboardPage } from "@/pages/customer/CustomerDashboardPage";
+import { CustomerHomePage } from "@/pages/customer/CustomerHomePage";
 import { CustomerHistoryPage } from "@/pages/customer/CustomerHistoryPage";
 import { CustomerPaymentMethodsPage } from "@/pages/customer/CustomerPaymentMethodsPage";
 import { DriverDocumentsPage } from "@/pages/driver/DriverDocumentsPage";
@@ -65,8 +65,9 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
-      { index: true, element: <CustomerDashboardPage /> },
+      { index: true, element: <CustomerHomePage /> },
       { path: "booking", element: <BookingPage /> },
+      { path: "booking/dropoff", element: <BookingPage /> },
       { path: "roadside", element: <RoadsidePage /> },
       { path: "tracking/:id", element: <TrackingPage /> },
       { path: "tracking", element: <TrackingPage /> },

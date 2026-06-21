@@ -12,6 +12,7 @@ import { useLiveActorLocations } from "@/hooks/useLiveActorLocations";
 import { usePaymentState } from "@/hooks/usePaymentState";
 import { useStreetRoute } from "@/hooks/useStreetRoute";
 import { calculateBookingEstimate } from "@/services/pricing";
+import { createCurrentLocationSuggestion } from "@/services/geocoding";
 import { useAppStore } from "@/store/useAppStore";
 import type { BookingDraft, ServiceType } from "@/types/domain";
 import { formatCurrency, formatDistance } from "@/utils/format";
@@ -27,6 +28,7 @@ export function BookingPage() {
   const navigate = useNavigate();
   const bookingDraft = useAppStore((state) => state.bookingDraft);
   const updateBookingDraft = useAppStore((state) => state.updateBookingDraft);
+  const addRecentLocation = useAppStore((state) => state.addRecentLocation);
   const pushNotification = useAppStore((state) => state.pushNotification);
   const payment = usePaymentState();
   const serviceType = bookingDraft.serviceType || "standard";
@@ -43,6 +45,27 @@ export function BookingPage() {
   const fareEstimate = bookingDraft.fareEstimate || bookingDraft.price || fallbackFare[serviceType];
   const displayDistanceKm = bookingRoute.distanceKm ?? bookingDraft.distanceKm;
   const displayDurationMinutes = bookingRoute.durationMinutes ?? bookingDraft.durationMinutes ?? actors.etaToDestinationMinutes ?? 8;
+
+  useEffect(() => {
+    if (!bookingDraft.pickup) {
+      updateBookingDraft({
+        pickup: createCurrentLocationSuggestion(actors.userLocation.lat, actors.userLocation.lng),
+        serviceType,
+        paymentMethod: payment.paymentMethod,
+        cashRequired: payment.isCash,
+        cashStatus: payment.isCash ? "pending_collection" : "not_required",
+        currency: "RON"
+      });
+    }
+  }, [
+    actors.userLocation.lat,
+    actors.userLocation.lng,
+    bookingDraft.pickup,
+    payment.isCash,
+    payment.paymentMethod,
+    serviceType,
+    updateBookingDraft
+  ]);
 
   useEffect(() => {
     if (bookingRoute.provider === "none" || !bookingRoute.distanceKm || !bookingRoute.durationMinutes) {
@@ -86,6 +109,20 @@ export function BookingPage() {
       fareEstimate,
       currency: "RON"
     });
+
+    if (bookingDraft.destination) {
+      addRecentLocation({
+        id: bookingDraft.destination.id,
+        label: bookingDraft.destination.street || bookingDraft.destination.label,
+        address:
+          [bookingDraft.destination.number, bookingDraft.destination.city, bookingDraft.destination.county]
+            .filter(Boolean)
+            .join(", ") || bookingDraft.destination.label,
+        lat: bookingDraft.destination.lat,
+        lng: bookingDraft.destination.lng,
+        lastUsedAt: new Date().toISOString()
+      });
+    }
 
     pushNotification({
       id: crypto.randomUUID(),

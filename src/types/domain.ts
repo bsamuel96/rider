@@ -23,7 +23,7 @@ export type BookingStatus =
   | "completed"
   | "cancelled";
 
-export type RoadsideIssue = "flat_tire" | "battery" | "engine" | "accident" | "fuel" | "other";
+export type RoadsideIssue = "flat_tire" | "battery" | "engine" | "accident" | "fuel" | "locked_keys" | "other";
 
 export type Coordinates = {
   lat: number;
@@ -55,6 +55,26 @@ export type Profile = {
   activeInstance?: AuthInstance;
   registrationStatus: RegistrationStatus;
   theme: ThemePreference;
+  preferredPaymentMethod?: PaymentMethod;
+};
+
+export type CustomerNotification = {
+  id: string;
+  title: string;
+  body: string;
+  type: "promo" | "safety" | "payment" | "system";
+  dismissible: boolean;
+  actionLabel?: string;
+  actionPath?: string;
+};
+
+export type RecentLocation = {
+  id: string;
+  label: string;
+  address: string;
+  lat: number;
+  lng: number;
+  lastUsedAt: string;
 };
 
 export type DriverProfile = {

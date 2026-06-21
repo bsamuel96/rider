@@ -20,7 +20,8 @@ const demoProfiles: Record<AuthInstance, Profile> = {
     role: "client",
     activeInstance: "customer",
     registrationStatus: "active",
-    theme: "system"
+    theme: "system",
+    preferredPaymentMethod: "cash"
   },
   driver: {
     id: "demo-driver",
@@ -31,7 +32,8 @@ const demoProfiles: Record<AuthInstance, Profile> = {
     role: "driver",
     activeInstance: "driver",
     registrationStatus: "active",
-    theme: "system"
+    theme: "system",
+    preferredPaymentMethod: "cash"
   },
   roadside: {
     id: "demo-roadside",
@@ -42,7 +44,8 @@ const demoProfiles: Record<AuthInstance, Profile> = {
     role: "roadside_operator",
     activeInstance: "roadside",
     registrationStatus: "active",
-    theme: "system"
+    theme: "system",
+    preferredPaymentMethod: "cash"
   }
 };
 

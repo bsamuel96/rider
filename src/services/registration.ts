@@ -23,7 +23,8 @@ function createLocalProfile(values: CustomerRegisterValues | DriverRegisterValue
     role: profile.role,
     activeInstance: profile.activeInstance,
     registrationStatus: profile.registrationStatus,
-    theme: useAppStore.getState().theme
+    theme: useAppStore.getState().theme,
+    preferredPaymentMethod: useAppStore.getState().preferredPaymentMethod
   };
 }
 
@@ -68,7 +69,8 @@ export async function signUpCustomer(values: CustomerRegisterValues) {
     role: "client",
     activeInstance: "customer",
     registrationStatus: "active",
-    theme: useAppStore.getState().theme
+    theme: useAppStore.getState().theme,
+    preferredPaymentMethod: useAppStore.getState().preferredPaymentMethod
   };
 
   await supabase.from("profiles").upsert({
@@ -80,7 +82,8 @@ export async function signUpCustomer(values: CustomerRegisterValues) {
     role: profile.role,
     active_instance: profile.activeInstance,
     registration_status: profile.registrationStatus,
-    theme: profile.theme
+    theme: profile.theme,
+    preferred_payment_method: profile.preferredPaymentMethod
   });
 
   if (values.primaryAddress) {
@@ -117,7 +120,8 @@ export async function signUpDriver(values: DriverRegisterValues) {
     role: "driver",
     activeInstance: "driver",
     registrationStatus: "pending_review",
-    theme: useAppStore.getState().theme
+    theme: useAppStore.getState().theme,
+    preferredPaymentMethod: useAppStore.getState().preferredPaymentMethod
   };
 
   await supabase.from("profiles").upsert({
@@ -129,7 +133,8 @@ export async function signUpDriver(values: DriverRegisterValues) {
     role: profile.role,
     active_instance: profile.activeInstance,
     registration_status: profile.registrationStatus,
-    theme: profile.theme
+    theme: profile.theme,
+    preferred_payment_method: profile.preferredPaymentMethod
   });
 
   await supabase.from("driver_profiles").insert({
@@ -180,7 +185,8 @@ export async function signUpRoadsideOperator(values: RoadsideRegisterValues) {
     role: "roadside_operator",
     activeInstance: "roadside",
     registrationStatus: "pending_review",
-    theme: useAppStore.getState().theme
+    theme: useAppStore.getState().theme,
+    preferredPaymentMethod: useAppStore.getState().preferredPaymentMethod
   };
 
   await supabase.from("profiles").upsert({
@@ -192,7 +198,8 @@ export async function signUpRoadsideOperator(values: RoadsideRegisterValues) {
     role: profile.role,
     active_instance: profile.activeInstance,
     registration_status: profile.registrationStatus,
-    theme: profile.theme
+    theme: profile.theme,
+    preferred_payment_method: profile.preferredPaymentMethod
   });
 
   await supabase.from("roadside_operator_profiles").insert({
