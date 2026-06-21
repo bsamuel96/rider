@@ -37,6 +37,11 @@ type LiveMobilityMapProps = {
   rating?: number;
   showMainActions?: boolean;
   showBottomControls?: boolean;
+  showTopOverlay?: boolean;
+  showBottomOverlay?: boolean;
+  showServiceDock?: boolean;
+  showPaymentChip?: boolean;
+  minimal?: boolean;
   primaryActionLabel?: string;
   secondaryActionLabel?: string;
   portalLabel: string;
@@ -52,7 +57,7 @@ type LiveMobilityMapProps = {
   className?: string;
 };
 
-function MapBounds({ points }: { points: LatLngTuple[] }) {
+function MapBounds({ points, mobilePadding }: { points: LatLngTuple[]; mobilePadding?: boolean }) {
   const map = useMap();
 
   useEffect(() => {
@@ -66,11 +71,20 @@ function MapBounds({ points }: { points: LatLngTuple[] }) {
       return;
     }
 
-    map.fitBounds(points, {
-      padding: [58, 58],
-      maxZoom: 15
-    });
-  }, [map, points]);
+    map.fitBounds(
+      points,
+      mobilePadding
+        ? {
+            paddingTopLeft: [32, 90],
+            paddingBottomRight: [32, 360],
+            maxZoom: 15
+          }
+        : {
+            padding: [58, 58],
+            maxZoom: 15
+          }
+    );
+  }, [map, mobilePadding, points]);
 
   return null;
 }
@@ -94,6 +108,11 @@ export function LiveMobilityMap({
   rating,
   showMainActions = true,
   showBottomControls = true,
+  showTopOverlay = true,
+  showBottomOverlay,
+  showServiceDock = true,
+  showPaymentChip = true,
+  minimal = false,
   primaryActionLabel = "Confirmă",
   secondaryActionLabel,
   portalLabel,
@@ -150,11 +169,13 @@ export function LiveMobilityMap({
   const routeProviderLabel =
     streetRoute.provider === "osrm" ? "Rută stradală" : streetRoute.provider === "fallback" ? "Rută estimată" : undefined;
   const routeIsFallback = streetRoute.provider === "fallback";
+  const shouldShowBottomOverlay = showBottomOverlay ?? showBottomControls;
 
   return (
     <div
       className={cn(
         "relative h-[100svh] min-h-[520px] overflow-hidden bg-muted lg:h-[calc(100vh-4rem)]",
+        minimal && "map-booking-mobile",
         className
       )}
     >
@@ -163,7 +184,7 @@ export function LiveMobilityMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url={TILE_URL}
         />
-        <MapBounds points={routeBounds} />
+        <MapBounds points={routeBounds} mobilePadding={minimal} />
         {route.length >= 2 && (
           <>
             <Polyline
@@ -204,6 +225,7 @@ export function LiveMobilityMap({
         />
       </MapContainer>
 
+      {showTopOverlay && (
       <div className="pointer-events-none absolute inset-x-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-[500] flex items-start justify-between gap-3 md:inset-x-5">
         <div className="pointer-events-auto space-y-2">
           <MapFloatingPanel className="px-3 py-2">
@@ -229,8 +251,9 @@ export function LiveMobilityMap({
           </MapFloatingButton>
         </div>
       </div>
+      )}
 
-      {showBottomControls && (
+      {shouldShowBottomOverlay && (
       <div className="pointer-events-none absolute inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-[540] space-y-2 md:inset-x-auto md:bottom-5 md:left-5 md:w-[420px]">
         <div className="pointer-events-auto flex flex-wrap gap-2">
           <MapEtaChip
@@ -245,12 +268,14 @@ export function LiveMobilityMap({
               distanceKm={displayDistanceToDestinationKm}
             />
           )}
-          <MapPaymentChip
-            paymentMethod={paymentMethod}
-            fareEstimate={fareEstimate}
-            cashEnabled={cashEnabled}
-            onClick={onCashToggle}
-          />
+          {showPaymentChip && (
+            <MapPaymentChip
+              paymentMethod={paymentMethod}
+              fareEstimate={fareEstimate}
+              cashEnabled={cashEnabled}
+              onClick={onCashToggle}
+            />
+          )}
         </div>
 
         {completed ? (
@@ -259,7 +284,7 @@ export function LiveMobilityMap({
           </div>
         ) : (
           <>
-            {onServiceChange && (
+            {showServiceDock && onServiceChange && (
               <div className="pointer-events-auto">
                 <MapServiceDock value={serviceType} onChange={onServiceChange} />
               </div>

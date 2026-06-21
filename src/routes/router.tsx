@@ -21,6 +21,7 @@ import { DriverDocumentsPage } from "@/pages/driver/DriverDocumentsPage";
 import { DriverEarningsPage } from "@/pages/driver/DriverEarningsPage";
 import { DriverPage } from "@/pages/driver/DriverPage";
 import { DriverPendingPage } from "@/pages/driver/DriverPendingPage";
+import { DriverRideDetailPage } from "@/pages/driver/DriverRideDetailPage";
 import { DriverRidesPage } from "@/pages/driver/DriverRidesPage";
 import { DriverVehiclePage } from "@/pages/driver/DriverVehiclePage";
 import { ProfilePage } from "@/pages/profile/ProfilePage";
@@ -87,7 +88,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <DriverPage /> },
       { path: "rides", element: <DriverRidesPage /> },
-      { path: "ride/:id", element: <DriverRidesPage /> },
+      { path: "ride/:id", element: <DriverRideDetailPage /> },
       { path: "earnings", element: <DriverEarningsPage /> },
       { path: "vehicle", element: <DriverVehiclePage /> },
       { path: "documents", element: <DriverDocumentsPage /> },

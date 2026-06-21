@@ -23,6 +23,25 @@ export type BookingStatus =
   | "completed"
   | "cancelled";
 
+export type DriverWorkflowStatus =
+  | "offline"
+  | "preflight"
+  | "available"
+  | "offer_received"
+  | "offer_accepted"
+  | "en_route_to_pickup"
+  | "arrived_at_pickup"
+  | "waiting_for_customer"
+  | "trip_started"
+  | "en_route_to_destination"
+  | "arrived_at_destination"
+  | "trip_completed"
+  | "cash_collection_required"
+  | "cash_collected"
+  | "rating_customer"
+  | "cooldown"
+  | "suspended";
+
 export type RoadsideIssue = "flat_tire" | "battery" | "engine" | "accident" | "fuel" | "locked_keys" | "other";
 
 export type Coordinates = {
@@ -153,6 +172,76 @@ export type BookingDraft = {
   currency?: "RON";
 };
 
+export type DriverRideOffer = {
+  id: string;
+  bookingId: string;
+  customerName: string;
+  customerRating: number;
+  pickupAddress: string;
+  destinationAddress: string;
+  pickup: Coordinates;
+  destination: Coordinates;
+  serviceType: ServiceType;
+  paymentMethod: PaymentMethod;
+  fareEstimate: number;
+  currency: "RON";
+  distanceToPickupKm: number;
+  routeDistanceKm: number;
+  etaToPickupMinutes: number;
+  etaToDestinationMinutes: number;
+  createdAt: string;
+  expiresAt: string;
+  status: "pending" | "accepted" | "rejected" | "expired";
+};
+
+export type DriverActiveBooking = Omit<DriverRideOffer, "status"> & {
+  status: DriverWorkflowStatus;
+  acceptedAt?: string;
+  driverEnRouteAt?: string;
+  arrivedAt?: string;
+  tripStartedAt?: string;
+  completedAt?: string;
+  cashStatus: CashStatus;
+};
+
+export type DriverAvailability = {
+  driverId: string;
+  online: boolean;
+  status: DriverWorkflowStatus;
+  currentLocation?: Coordinates;
+  shiftStartedAt?: string;
+  updatedAt: string;
+};
+
+export type DriverShiftSummary = {
+  id: string;
+  driverId: string;
+  startedAt: string;
+  endedAt?: string;
+  onlineMinutes: number;
+  completedRides: number;
+  grossEarnings: number;
+  cashCollected: number;
+  cardEarnings: number;
+  currency: "RON";
+};
+
+export type DriverEarningsLedgerEntry = {
+  id: string;
+  bookingId?: string;
+  label: string;
+  amount: number;
+  paymentMethod: PaymentMethod;
+  createdAt: string;
+};
+
+export type DriverWorkflowAction = {
+  id: string;
+  label: string;
+  nextStatus?: DriverWorkflowStatus;
+  variant?: "primary" | "secondary" | "destructive";
+};
+
 export type StreetRoute = {
   points: Coordinates[];
   distanceKm?: number;
@@ -169,7 +258,11 @@ export type RatingTag =
   | "Profesionist"
   | "Echipat"
   | "Clar"
-  | "Recomand";
+  | "Recomand"
+  | "La timp"
+  | "Locație clară"
+  | "Problemă plată"
+  | "Nu s-a prezentat";
 
 export type RatingDraft = {
   value: number;

@@ -163,6 +163,10 @@
     overflow: hidden;
   }
 
+  .map-booking-mobile {
+    min-height: 100svh;
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }

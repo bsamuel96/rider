@@ -176,6 +176,16 @@ export type Database = {
           payment_method: string;
           cash_status: string;
           currency: string;
+          accepted_at: string | null;
+          driver_en_route_at: string | null;
+          arrived_at: string | null;
+          trip_started_at: string | null;
+          completed_at: string | null;
+          cancelled_at: string | null;
+          cancellation_reason: string | null;
+          driver_workflow_status: string | null;
+          driver_notes: string | null;
+          cash_collected_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -194,6 +204,16 @@ export type Database = {
           payment_method?: string;
           cash_status?: string;
           currency?: string;
+          accepted_at?: string | null;
+          driver_en_route_at?: string | null;
+          arrived_at?: string | null;
+          trip_started_at?: string | null;
+          completed_at?: string | null;
+          cancelled_at?: string | null;
+          cancellation_reason?: string | null;
+          driver_workflow_status?: string | null;
+          driver_notes?: string | null;
+          cash_collected_at?: string | null;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["bookings"]["Insert"]>;
@@ -249,6 +269,122 @@ export type Database = {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["driver_locations"]["Insert"]>;
+        Relationships: [];
+      };
+      driver_availability: {
+        Row: {
+          driver_id: string;
+          online: boolean;
+          workflow_status: string;
+          lat: number | null;
+          lng: number | null;
+          shift_started_at: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          driver_id: string;
+          online?: boolean;
+          workflow_status?: string;
+          lat?: number | null;
+          lng?: number | null;
+          shift_started_at?: string | null;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["driver_availability"]["Insert"]>;
+        Relationships: [];
+      };
+      driver_ride_offers: {
+        Row: {
+          id: string;
+          booking_id: string;
+          driver_id: string;
+          status: string;
+          expires_at: string;
+          responded_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          booking_id: string;
+          driver_id: string;
+          status?: string;
+          expires_at: string;
+          responded_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["driver_ride_offers"]["Insert"]>;
+        Relationships: [];
+      };
+      driver_shift_sessions: {
+        Row: {
+          id: string;
+          driver_id: string;
+          started_at: string;
+          ended_at: string | null;
+          online_minutes: number;
+          completed_rides: number;
+          gross_earnings: number;
+          cash_collected: number;
+          card_earnings: number;
+          currency: string;
+        };
+        Insert: {
+          id?: string;
+          driver_id: string;
+          started_at?: string;
+          ended_at?: string | null;
+          online_minutes?: number;
+          completed_rides?: number;
+          gross_earnings?: number;
+          cash_collected?: number;
+          card_earnings?: number;
+          currency?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["driver_shift_sessions"]["Insert"]>;
+        Relationships: [];
+      };
+      driver_earnings_ledger: {
+        Row: {
+          id: string;
+          driver_id: string;
+          booking_id: string | null;
+          amount: number;
+          payment_method: string;
+          entry_type: string;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          driver_id: string;
+          booking_id?: string | null;
+          amount: number;
+          payment_method: string;
+          entry_type?: string;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["driver_earnings_ledger"]["Insert"]>;
+        Relationships: [];
+      };
+      driver_events: {
+        Row: {
+          id: string;
+          driver_id: string;
+          booking_id: string | null;
+          event_type: string;
+          metadata: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          driver_id: string;
+          booking_id?: string | null;
+          event_type: string;
+          metadata?: Json | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["driver_events"]["Insert"]>;
         Relationships: [];
       };
       roadside_operator_locations: {

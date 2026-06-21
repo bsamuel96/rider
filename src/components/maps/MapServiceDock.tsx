@@ -12,11 +12,12 @@ const serviceItems: { type: ServiceType; label: string; icon: typeof Car }[] = [
 type MapServiceDockProps = {
   value?: ServiceType;
   onChange: (serviceType: ServiceType) => void;
+  compact?: boolean;
 };
 
-export function MapServiceDock({ value, onChange }: MapServiceDockProps) {
+export function MapServiceDock({ value, onChange, compact }: MapServiceDockProps) {
   return (
-    <div className="glass-dock map-layer-dock grid grid-cols-4 gap-2 p-2">
+    <div className={cn("glass-dock map-layer-dock grid grid-cols-4 gap-2 p-2", compact && "gap-1 p-1.5")}>
       {serviceItems.map((item) => (
         <button
           key={item.type}
@@ -24,10 +25,11 @@ export function MapServiceDock({ value, onChange }: MapServiceDockProps) {
           onClick={() => onChange(item.type)}
           className={cn(
             "flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-2 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            compact && "min-h-[62px] px-1 text-[10px] sm:text-xs",
             value === item.type && "bg-primary text-primary-foreground shadow-map-control"
           )}
         >
-          <item.icon className="h-4 w-4" />
+          <item.icon className={cn("h-4 w-4", compact && "h-[18px] w-[18px]")} />
           {item.label}
         </button>
       ))}
