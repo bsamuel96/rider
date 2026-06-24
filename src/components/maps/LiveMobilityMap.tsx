@@ -43,6 +43,7 @@ type LiveMobilityMapProps = {
   showBottomOverlay?: boolean;
   showServiceDock?: boolean;
   showPaymentChip?: boolean;
+  showFloatingControls?: boolean;
   minimal?: boolean;
   primaryActionLabel?: string;
   secondaryActionLabel?: string;
@@ -53,6 +54,7 @@ type LiveMobilityMapProps = {
   onSecondaryAction?: () => void;
   onCashToggle?: () => void;
   onLocateMe?: (coordinates: Coordinates) => void;
+  locateRequestKey?: number;
   onThemeToggle?: () => void;
   onRate?: (rating: number) => void;
   onServiceChange?: (serviceType: ServiceType) => void;
@@ -124,6 +126,7 @@ export function LiveMobilityMap({
   showBottomOverlay,
   showServiceDock = true,
   showPaymentChip = true,
+  showFloatingControls = true,
   minimal = false,
   primaryActionLabel = "Confirmă",
   secondaryActionLabel,
@@ -134,6 +137,7 @@ export function LiveMobilityMap({
   onSecondaryAction,
   onCashToggle,
   onLocateMe,
+  locateRequestKey,
   onThemeToggle,
   onRate,
   onServiceChange,
@@ -185,6 +189,33 @@ export function LiveMobilityMap({
     streetRoute.provider === "osrm" ? "Rută stradală" : streetRoute.provider === "fallback" ? "Rută estimată" : undefined;
   const routeIsFallback = streetRoute.provider === "fallback";
   const shouldShowBottomOverlay = showBottomOverlay ?? showBottomControls;
+
+  useEffect(() => {
+    if (!locateRequestKey || !map || !navigator.geolocation) {
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coordinates = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        setFocusedUserLocation(coordinates);
+        onLocateMe?.(coordinates);
+        map.flyTo([coordinates.lat, coordinates.lng], 16, {
+          animate: true,
+          duration: 0.65
+        });
+      },
+      () => undefined,
+      {
+        enableHighAccuracy: true,
+        timeout: 8000,
+        maximumAge: 15000
+      }
+    );
+  }, [locateRequestKey, map, onLocateMe]);
 
   return (
     <div
@@ -279,7 +310,7 @@ export function LiveMobilityMap({
       </div>
       )}
 
-      {!showTopOverlay && (
+      {!showTopOverlay && showFloatingControls && (
         <div
           className={cn(
             "pointer-events-auto absolute right-3 z-[505] flex flex-col gap-2 md:right-5",

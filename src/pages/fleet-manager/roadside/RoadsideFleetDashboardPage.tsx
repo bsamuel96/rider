@@ -1,4 +1,5 @@
 import { AlertTriangle, LifeBuoy, MessageSquareWarning } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FleetSectionNav } from "@/components/fleet/FleetSectionNav";
 import { RoadsideAlertsPanel } from "@/components/fleet/roadside/RoadsideAlertsPanel";
@@ -11,6 +12,7 @@ import { RoadsideRequestQueue } from "@/components/fleet/roadside/RoadsideReques
 import { RoadsideVehicleStatus } from "@/components/fleet/roadside/RoadsideVehicleStatus";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { MinimizableBottomSheet } from "@/components/mobile/MinimizableBottomSheet";
 import { useToast } from "@/hooks/useToast";
 import { roadsideFleetNavItems } from "@/pages/fleet-manager/fleetSubnav";
 import { getRoadsideFleetStats } from "@/services/roadsideFleet";
@@ -19,6 +21,7 @@ import { formatCurrency } from "@/utils/format";
 export function RoadsideFleetDashboardPage() {
   const { toast } = useToast();
   const stats = getRoadsideFleetStats();
+  const [briefOpen, setBriefOpen] = useState(false);
 
   return (
     <div className="mx-auto max-w-7xl space-y-5">
@@ -103,12 +106,32 @@ export function RoadsideFleetDashboardPage() {
                   Support ticket
                 </Link>
               </Button>
+              <Button type="button" variant="outline" onClick={() => setBriefOpen(true)}>
+                Operations brief
+              </Button>
             </div>
           </Card>
         </div>
       </div>
 
       <RoadsideAlertsPanel />
+
+      {briefOpen && (
+        <MinimizableBottomSheet
+          title="Roadside operations brief"
+          description="Tow and intervention snapshot."
+          initialState="half"
+          dismissible
+          onStateChange={(state) => state === "closed" && setBriefOpen(false)}
+        >
+          <div className="grid gap-3">
+            <MiniMetric label="Active operators" value={stats.onlineOperators} />
+            <MiniMetric label="Arrival confirmations pending" value={stats.arrivalConfirmationsPending} />
+            <MiniMetric label="Issue solved confirmations pending" value={stats.solvedConfirmationsPending} />
+            <MiniMetric label="Fast guarantee risk" value={stats.fastRequestsAtRisk} />
+          </div>
+        </MinimizableBottomSheet>
+      )}
     </div>
   );
 }

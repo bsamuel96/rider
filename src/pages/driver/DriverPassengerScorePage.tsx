@@ -1,0 +1,1 @@
+export { DriverPassengerScorePage } from "./DriverScorePage";

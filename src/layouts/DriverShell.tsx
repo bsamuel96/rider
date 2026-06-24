@@ -1,8 +1,10 @@
-import { Banknote, Car, FileCheck2, Gauge, LifeBuoy, Route, UserRound } from "lucide-react";
+import { Banknote, CalendarClock, Car, FileCheck2, Gauge, Gift, LifeBuoy, Route, UserRound } from "lucide-react";
 import { RoleShellFrame, type RoleNavItem } from "@/layouts/RoleShellFrame";
 
 const driverNavItems: RoleNavItem[] = [
   { to: "/driver", label: "Dashboard", icon: Gauge },
+  { to: "/driver/campaigns", label: "Campanii", icon: Gift },
+  { to: "/driver/scheduled", label: "Programate", icon: CalendarClock },
   { to: "/driver/rides", label: "Curse", icon: Route },
   { to: "/driver/earnings", label: "Câștiguri", icon: Banknote },
   { to: "/driver/vehicle", label: "Vehicul", icon: Car },
@@ -12,10 +14,10 @@ const driverNavItems: RoleNavItem[] = [
 ];
 
 const driverMobileNavItems: RoleNavItem[] = [
-  { to: "/driver", label: "Dashboard", icon: Gauge },
+  { to: "/driver", label: "Acasă", icon: Gauge },
+  { to: "/driver/campaigns", label: "Câștigă", icon: Gift },
   { to: "/driver/rides", label: "Curse", icon: Route },
-  { to: "/driver/earnings", label: "Câștiguri", icon: Banknote },
-  { to: "/driver/vehicle", label: "Vehicul", icon: Car },
+  { to: "/driver/support", label: "Ajutor", icon: LifeBuoy },
   { to: "/driver/profile", label: "Profil", icon: UserRound }
 ];
 

@@ -24,11 +24,25 @@ import { CustomerHomePage } from "@/pages/customer/CustomerHomePage";
 import { CustomerHistoryPage } from "@/pages/customer/CustomerHistoryPage";
 import { CustomerPaymentMethodsPage } from "@/pages/customer/CustomerPaymentMethodsPage";
 import { DriverDocumentsPage } from "@/pages/driver/DriverDocumentsPage";
+import { DriverAcceptanceRatePage } from "@/pages/driver/DriverAcceptanceRatePage";
+import { DriverActivityPage } from "@/pages/driver/DriverActivityPage";
+import { DriverCampaignsPage } from "@/pages/driver/DriverCampaignsPage";
 import { DriverEarningsPage } from "@/pages/driver/DriverEarningsPage";
+import { DriverGuideCenterPage } from "@/pages/driver/DriverGuideCenterPage";
+import { DriverMenuPage } from "@/pages/driver/DriverMenuPage";
 import { DriverPage } from "@/pages/driver/DriverPage";
+import { DriverPassengerScorePage } from "@/pages/driver/DriverPassengerScorePage";
 import { DriverPendingPage } from "@/pages/driver/DriverPendingPage";
+import { DriverPortalPage } from "@/pages/driver/DriverPortalPage";
+import { DriverPrivacyPage } from "@/pages/driver/DriverPrivacyPage";
+import { DriverRatingPage } from "@/pages/driver/DriverRatingPage";
 import { DriverRideDetailPage } from "@/pages/driver/DriverRideDetailPage";
 import { DriverRidesPage } from "@/pages/driver/DriverRidesPage";
+import { DriverSafetyPage } from "@/pages/driver/DriverSafetyPage";
+import { DriverScheduledRidesPage } from "@/pages/driver/DriverScheduledRidesPage";
+import { DriverScorePage } from "@/pages/driver/DriverScorePage";
+import { DriverSettingsPage } from "@/pages/driver/DriverSettingsPage";
+import { DriverSupportPage } from "@/pages/driver/DriverSupportPage";
 import { DriverVehiclePage } from "@/pages/driver/DriverVehiclePage";
 import { FleetManagerHomePage } from "@/pages/fleet-manager/FleetManagerHomePage";
 import { RoadsideAnalyticsPage } from "@/pages/fleet-manager/roadside/RoadsideAnalyticsPage";
@@ -114,15 +128,33 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <DriverPage /> },
+      { path: "menu", element: <DriverMenuPage /> },
+      { path: "activity", element: <DriverActivityPage /> },
       { path: "rides", element: <DriverRidesPage /> },
       { path: "ride/:id", element: <DriverRideDetailPage /> },
       { path: "earnings", element: <DriverEarningsPage /> },
+      { path: "campaigns", element: <DriverCampaignsPage /> },
+      { path: "campaigns/:id", element: <DriverCampaignsPage /> },
+      { path: "scheduled", element: <DriverScheduledRidesPage /> },
+      { path: "settings", element: <DriverSettingsPage /> },
+      { path: "portal", element: <DriverPortalPage /> },
+      { path: "privacy", element: <DriverPrivacyPage /> },
+      { path: "score", element: <DriverScorePage /> },
+      { path: "rating", element: <DriverRatingPage /> },
+      { path: "acceptance-rate", element: <DriverAcceptanceRatePage /> },
+      { path: "passenger-score", element: <DriverPassengerScorePage /> },
+      { path: "safety", element: <DriverSafetyPage /> },
       { path: "vehicle", element: <DriverVehiclePage /> },
       { path: "documents", element: <DriverDocumentsPage /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "pending", element: <DriverPendingPage /> },
       { path: "chat/:threadId", element: <ChatPage /> },
-      { path: "support", element: <SupportPage /> },
+      { path: "support", element: <DriverSupportPage /> },
+      { path: "support/cases", element: <DriverSupportPage /> },
+      { path: "support/cases/:caseId", element: <DriverSupportPage /> },
+      { path: "support/messages", element: <DriverSupportPage /> },
+      { path: "support/guides", element: <DriverGuideCenterPage /> },
+      { path: "support/guides/:slug", element: <DriverGuideCenterPage /> },
       { path: "support/new", element: <NewSupportTicketPage /> },
       { path: "support/:ticketId", element: <SupportTicketPage /> }
     ]

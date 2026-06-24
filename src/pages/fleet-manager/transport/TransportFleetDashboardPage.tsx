@@ -1,4 +1,5 @@
 import { CheckCircle2, LifeBuoy, Wrench } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FleetSectionNav } from "@/components/fleet/FleetSectionNav";
 import { TransportAlertsPanel } from "@/components/fleet/transport/TransportAlertsPanel";
@@ -9,6 +10,7 @@ import { TransportRideQueue } from "@/components/fleet/transport/TransportRideQu
 import { TransportVehicleStatus } from "@/components/fleet/transport/TransportVehicleStatus";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { MinimizableBottomSheet } from "@/components/mobile/MinimizableBottomSheet";
 import { useToast } from "@/hooks/useToast";
 import { getTransportFleetStats } from "@/services/transportFleet";
 import { transportFleetNavItems } from "@/pages/fleet-manager/fleetSubnav";
@@ -17,6 +19,7 @@ import { formatCurrency } from "@/utils/format";
 export function TransportFleetDashboardPage() {
   const { toast } = useToast();
   const stats = getTransportFleetStats();
+  const [briefOpen, setBriefOpen] = useState(false);
 
   return (
     <div className="mx-auto max-w-7xl space-y-5">
@@ -85,12 +88,32 @@ export function TransportFleetDashboardPage() {
                   Support ticket
                 </Link>
               </Button>
+              <Button type="button" variant="outline" onClick={() => setBriefOpen(true)}>
+                Operations brief
+              </Button>
             </div>
           </Card>
         </div>
       </div>
 
       <TransportAlertsPanel />
+
+      {briefOpen && (
+        <MinimizableBottomSheet
+          title="Transport operations brief"
+          description="Fleet transport snapshot."
+          initialState="half"
+          dismissible
+          onStateChange={(state) => state === "closed" && setBriefOpen(false)}
+        >
+          <div className="grid gap-3">
+            <MiniMetric label="Active drivers" value={stats.onlineDrivers} />
+            <MiniMetric label="Completed rides" value={stats.completedRidesToday} />
+            <MiniMetric label="Cancelled rides" value={stats.cancelledRidesToday} />
+            <MiniMetric label="Driver acceptance focus" value="88% target" />
+          </div>
+        </MinimizableBottomSheet>
+      )}
     </div>
   );
 }
