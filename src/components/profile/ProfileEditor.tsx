@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LogOut, Save, UserRound } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AddressSearch } from "@/components/booking/AddressSearch";
 import { LocationPickerSheet } from "@/components/location/LocationPickerSheet";
 import { ProfileAvatarEditor } from "@/components/profile/ProfileAvatarEditor";
@@ -90,6 +91,7 @@ function getDefaultValues(profile: Profile): CommonProfileValues {
 
 export function ProfileEditor({ profile }: ProfileEditorProps) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { position } = useGeolocation();
   const logout = useAppStore((state) => state.logout);
   const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl);
@@ -127,6 +129,24 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
   const dirty = isDirty || avatarDirty || roleDirty;
   const formValues = watch();
   const currentLocation = createCurrentLocationSuggestion(position.lat, position.lng);
+
+  useEffect(() => {
+    if (searchParams.get("logout") === "1") {
+      setLogoutDialogOpen(true);
+    }
+  }, [searchParams]);
+
+  const closeLogoutDialog = () => {
+    setLogoutDialogOpen(false);
+
+    if (!searchParams.has("logout")) {
+      return;
+    }
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("logout");
+    setSearchParams(nextSearchParams, { replace: true });
+  };
 
   const selectProfileAddress = (field: ProfileAddressField, address: AddressSuggestion) => {
     const nextAddress = {
@@ -458,22 +478,24 @@ export function ProfileEditor({ profile }: ProfileEditorProps) {
         }}
       />
 
-      {logoutDialogOpen && (
-        <div className="fixed inset-0 z-[800] grid place-items-center bg-background/45 p-4 backdrop-blur-sm">
-          <Card className="w-full max-w-sm rounded-3xl p-5">
-            <h2 className="text-lg font-semibold">Sigur vrei să ieși din cont?</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Va trebui să te autentifici din nou pentru a continua.</p>
-            <div className="mt-5 grid grid-cols-2 gap-2">
-              <Button type="button" variant="outline" onClick={() => setLogoutDialogOpen(false)}>
-                Anulează
-              </Button>
-              <Button type="button" variant="destructive" onClick={() => void confirmLogout()}>
-                Ieși din cont
-              </Button>
-            </div>
-          </Card>
-        </div>
-      )}
+      {logoutDialogOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[800] grid place-items-center bg-background/45 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="logout-dialog-title">
+            <Card className="w-full max-w-sm rounded-3xl p-5">
+              <h2 id="logout-dialog-title" className="text-lg font-semibold">Sigur vrei să ieși din cont?</h2>
+              <p className="mt-2 text-sm text-muted-foreground">Va trebui să te autentifici din nou pentru a continua.</p>
+              <div className="mt-5 grid grid-cols-2 gap-2">
+                <Button type="button" variant="outline" onClick={closeLogoutDialog}>
+                  Anulează
+                </Button>
+                <Button type="button" variant="destructive" onClick={() => void confirmLogout()}>
+                  Ieși din cont
+                </Button>
+              </div>
+            </Card>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

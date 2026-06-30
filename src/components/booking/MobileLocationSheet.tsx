@@ -1,6 +1,6 @@
 import { MapPin, MapPinned, Navigation } from "lucide-react";
 import { AddressSearch } from "@/components/booking/AddressSearch";
-import { MobileBottomSheet } from "@/components/mobile/MobileBottomSheet";
+import { MinimizableBottomSheet } from "@/components/mobile/MinimizableBottomSheet";
 import type { AddressSuggestion } from "@/types/domain";
 
 type MobileLocationSheetProps = {
@@ -24,8 +24,24 @@ export function MobileLocationSheet({
   onDestinationPickOnMap,
   onContinue
 }: MobileLocationSheetProps) {
+  const compactSummary = (
+    <div className="min-w-0 py-1">
+      <p className="truncate text-sm font-semibold">{pickup?.label || "Locația mea curentă"}</p>
+      <p className="truncate text-xs text-muted-foreground">{destination?.label || "Alege destinația"}</p>
+    </div>
+  );
+
   return (
-    <MobileBottomSheet size="large" className="max-h-[42svh]">
+    <MinimizableBottomSheet
+      title="Traseu"
+      description={destination ? "Verifică pickup-ul și destinația." : "Alege destinația pentru cursă."}
+      compactContent={compactSummary}
+      minimizedLabel={destination?.label || "Alege destinația"}
+      initialState="half"
+      dragDownToMinimize
+      showControls={false}
+      className="inset-x-3 bg-background/90 md:hidden"
+    >
       <div className="space-y-3">
         <div className="flex items-center gap-3 rounded-2xl bg-muted/55 p-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/12 text-primary">
@@ -70,6 +86,6 @@ export function MobileLocationSheet({
           </p>
         )}
       </div>
-    </MobileBottomSheet>
+    </MinimizableBottomSheet>
   );
 }

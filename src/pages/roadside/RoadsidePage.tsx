@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ShieldAlert } from "lucide-react";
 import { LiveMobilityMap } from "@/components/maps/LiveMobilityMap";
-import { MapBottomSheet } from "@/components/maps/MapBottomSheet";
 import { MapStatusPill } from "@/components/maps/MapStatusPill";
 import { LocationPickerSheet } from "@/components/location/LocationPickerSheet";
+import { MinimizableBottomSheet } from "@/components/mobile/MinimizableBottomSheet";
 import { RoadsideConfirmStep } from "@/components/roadside/RoadsideConfirmStep";
 import { RoadsideIssueStep } from "@/components/roadside/RoadsideIssueStep";
 import { RoadsideLocationStep } from "@/components/roadside/RoadsideLocationStep";
@@ -284,24 +283,30 @@ export function RoadsidePage() {
         className="min-h-[100svh] lg:min-h-[calc(100vh-4rem)]"
       />
 
-      <MapBottomSheet className="absolute inset-x-3 bottom-[var(--floating-bottom-offset)] z-[540] max-h-[min(68svh,640px)] overflow-y-auto md:inset-x-auto md:bottom-5 md:left-5 md:w-[440px] md:rounded-3xl">
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-primary-foreground">
-              <ShieldAlert className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <div>
-              <p className="text-sm font-semibold">{mode === "tow" ? "Solicitare tractare" : "Asistență rutieră"}</p>
-              <p className="text-xs text-muted-foreground">
-                {submitted ? "Ajutorul este pe drum." : "Poziție, problemă, siguranță, confirmare."}
-              </p>
+      <MinimizableBottomSheet
+        title={mode === "tow" ? "Solicitare tractare" : "Asistență rutieră"}
+        description={submitted ? "Ajutorul este pe drum." : "Poziție, problemă, siguranță, confirmare."}
+        compactContent={
+          <div className="space-y-3 py-1">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold">{currentAddress.label}</p>
+                <p className="text-xs text-muted-foreground">{submitted ? "În desfășurare" : "Solicitare în lucru"}</p>
+              </div>
+              <MapStatusPill label={`~${etaToOperatorMinutes} min`} tone="success" />
             </div>
+            {!submitted && <RoadsideStepProgress currentStep={step} />}
           </div>
-          <MapStatusPill label={`~${etaToOperatorMinutes} min`} tone="success" />
-        </div>
+        }
+        minimizedLabel={mode === "tow" ? "Tractare" : "Asistență"}
+        initialState="half"
+        dragDownToMinimize
+        showControls={false}
+        className="inset-x-3 bg-background/90 md:bottom-5 md:left-5 md:right-auto md:w-[440px] md:rounded-3xl"
+      >
         {!submitted && <RoadsideStepProgress currentStep={step} />}
         <div className="mt-4">{renderStep()}</div>
-      </MapBottomSheet>
+      </MinimizableBottomSheet>
       <LocationPickerSheet
         open={locationPickerOpen}
         title={mode === "tow" ? "Alege locația vehiculului" : "Alege locația intervenției"}

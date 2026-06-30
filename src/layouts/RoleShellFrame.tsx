@@ -40,14 +40,12 @@ export function RoleShellFrame({
   const online = useOnlineStatus();
   const profile = useAppStore((state) => state.profile);
   const notifications = useAppStore((state) => state.notifications);
-  const logout = useAppStore((state) => state.logout);
   const unreadCount = notifications.filter((notification) => !notification.read).length;
   const bottomNavItems = mobileNavItems || navItems;
   useRealtimeNotifications();
 
-  const exit = async () => {
-    await logout();
-    navigate("/auth");
+  const openLogoutDialog = () => {
+    navigate(`${profilePath}?logout=1`);
   };
 
   return (
@@ -99,7 +97,7 @@ export function RoleShellFrame({
                 )}
               </span>
             </Button>
-            <Button variant="ghost" size="icon" onClick={exit} aria-label="Logout">
+            <Button variant="ghost" size="icon" onClick={openLogoutDialog} aria-label="Logout">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>

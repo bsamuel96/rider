@@ -9,6 +9,11 @@ type UseMinimizablePanelOptions = {
   dismissible?: boolean;
 };
 
+type DragEndOptions = {
+  downwardState?: PanelState;
+  upwardState?: PanelState;
+};
+
 export function useMinimizablePanel({ initialState = "half", dismissible = false }: UseMinimizablePanelOptions = {}) {
   const [state, setState] = useState<PanelState>(initialState);
   const previousOpenState = useRef<Exclude<PanelState, "closed">>(initialState === "closed" ? "half" : initialState);
@@ -59,22 +64,42 @@ export function useMinimizablePanel({ initialState = "half", dismissible = false
     dragStartY.current = clientY;
   }, []);
 
+  const onDragCancel = useCallback(() => {
+    dragStartY.current = null;
+  }, []);
+
   const onDragEnd = useCallback(
-    (clientY: number) => {
+    (clientY: number, options: DragEndOptions = {}) => {
       if (dragStartY.current === null) {
-        return;
+        return null;
       }
 
       const deltaY = clientY - dragStartY.current;
       dragStartY.current = null;
 
       if (Math.abs(deltaY) < 32) {
-        return;
+        return null;
       }
 
-      step(deltaY > 0 ? "down" : "up");
+      const forcedState = deltaY > 0 ? options.downwardState : options.upwardState;
+
+      if (forcedState) {
+        updateState(forcedState);
+        return forcedState;
+      }
+
+      if (state === "closed") {
+        reopen();
+        return previousOpenState.current;
+      }
+
+      const currentIndex = panelOrder.indexOf(state);
+      const nextIndex = deltaY > 0 ? Math.min(panelOrder.length - 1, currentIndex + 1) : Math.max(0, currentIndex - 1);
+      const nextState = panelOrder[nextIndex];
+      updateState(nextState);
+      return nextState;
     },
-    [step]
+    [reopen, state, updateState]
   );
 
   return {
@@ -89,6 +114,7 @@ export function useMinimizablePanel({ initialState = "half", dismissible = false
     toggle,
     step,
     onDragStart,
+    onDragCancel,
     onDragEnd,
     dismissible
   };

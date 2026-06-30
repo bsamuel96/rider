@@ -41,11 +41,10 @@ const menuItems = [
 export function DriverMenuDrawer({ open, onClose }: DriverMenuDrawerProps) {
   const navigate = useNavigate();
   const profile = useAppStore((state) => state.profile);
-  const logout = useAppStore((state) => state.logout);
 
-  const exit = async () => {
-    await logout();
-    navigate("/auth");
+  const openLogoutDialog = () => {
+    onClose();
+    navigate("/driver/profile?logout=1");
   };
 
   return (
@@ -106,7 +105,7 @@ export function DriverMenuDrawer({ open, onClose }: DriverMenuDrawerProps) {
         </nav>
 
         <div className="mt-auto pt-5">
-          <Button type="button" variant="outline" className="w-full justify-center" onClick={exit}>
+          <Button type="button" variant="outline" className="w-full justify-center" onClick={openLogoutDialog}>
             <LogOut className="h-4 w-4" aria-hidden="true" />
             Logout
           </Button>
