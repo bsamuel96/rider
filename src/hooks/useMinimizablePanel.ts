@@ -16,6 +16,8 @@ type DragEndOptions = {
 
 export function useMinimizablePanel({ initialState = "half", dismissible = false }: UseMinimizablePanelOptions = {}) {
   const [state, setState] = useState<PanelState>(initialState);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const previousOpenState = useRef<Exclude<PanelState, "closed">>(initialState === "closed" ? "half" : initialState);
   const dragStartY = useRef<number | null>(null);
 
@@ -62,10 +64,24 @@ export function useMinimizablePanel({ initialState = "half", dismissible = false
 
   const onDragStart = useCallback((clientY: number) => {
     dragStartY.current = clientY;
+    setDragOffset(0);
+    setIsDragging(true);
+  }, []);
+
+  const onDragMove = useCallback((clientY: number) => {
+    if (dragStartY.current === null) {
+      return;
+    }
+
+    const deltaY = clientY - dragStartY.current;
+    const limitedOffset = Math.max(-72, Math.min(deltaY, 320));
+    setDragOffset(limitedOffset);
   }, []);
 
   const onDragCancel = useCallback(() => {
     dragStartY.current = null;
+    setDragOffset(0);
+    setIsDragging(false);
   }, []);
 
   const onDragEnd = useCallback(
@@ -76,6 +92,8 @@ export function useMinimizablePanel({ initialState = "half", dismissible = false
 
       const deltaY = clientY - dragStartY.current;
       dragStartY.current = null;
+      setDragOffset(0);
+      setIsDragging(false);
 
       if (Math.abs(deltaY) < 32) {
         return null;
@@ -113,7 +131,10 @@ export function useMinimizablePanel({ initialState = "half", dismissible = false
     reopen,
     toggle,
     step,
+    dragOffset,
+    isDragging,
     onDragStart,
+    onDragMove,
     onDragCancel,
     onDragEnd,
     dismissible

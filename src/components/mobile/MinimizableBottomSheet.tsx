@@ -70,6 +70,10 @@ export function MinimizableBottomSheet({
     panel.onDragCancel();
   };
 
+  const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
+    panel.onDragMove(event.clientY);
+  };
+
   if (panel.state === "closed") {
     return null;
   }
@@ -91,18 +95,34 @@ export function MinimizableBottomSheet({
     );
   }
 
+  const downwardDragOffset = Math.max(panel.dragOffset, 0);
+  const upwardDragOffset = Math.min(panel.dragOffset, 0);
+  const dragScale = panel.isDragging ? 1 - Math.min(downwardDragOffset / 2400, 0.04) : 1;
+  const dragOpacity = panel.isDragging ? 1 - Math.min(downwardDragOffset / 900, 0.12) : 1;
+  const dragTransform =
+    panel.isDragging && panel.dragOffset !== 0
+      ? `translate3d(0, ${downwardDragOffset + upwardDragOffset * 0.35}px, 0) scale(${dragScale})`
+      : undefined;
+
   return (
     <section
       className={cn(
-        "fixed inset-x-0 bottom-[var(--floating-bottom-offset)] z-[640] mx-auto flex max-w-xl flex-col overflow-hidden rounded-t-[2rem] border border-border/60 bg-background/90 shadow-floating backdrop-blur-2xl transition-[height,transform] duration-200 motion-reduce:transition-none md:left-5 md:right-auto md:w-[420px] md:rounded-2xl",
+        "fixed inset-x-0 bottom-[var(--floating-bottom-offset)] z-[640] mx-auto flex max-w-xl origin-bottom flex-col overflow-hidden rounded-t-[2rem] border border-border/60 bg-background/90 shadow-floating backdrop-blur-2xl transition-[height,opacity,transform] duration-200 motion-reduce:transition-none md:left-5 md:right-auto md:w-[420px] md:rounded-2xl",
+        panel.isDragging && "transition-none",
         stateClasses[panel.state],
         className
       )}
+      style={{
+        transform: dragTransform,
+        opacity: dragOpacity,
+        transition: panel.isDragging ? "none" : undefined
+      }}
       aria-label={title}
     >
       <div
         className="shrink-0 touch-none select-none rounded-t-[2rem] bg-background/75 px-4 pt-2 backdrop-blur-xl md:rounded-t-2xl"
         onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
       >

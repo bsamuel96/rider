@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Camera, FileCheck2, UserPlus } from "lucide-react";
+import { Camera, Eye, EyeOff, FileCheck2, UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { type Resolver, useForm } from "react-hook-form";
@@ -119,6 +119,9 @@ const submitText: Record<AuthInstance, string> = {
 export function RegisterForm({ instance }: RegisterFormProps) {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const schema = useMemo(() => registerSchema[instance], [instance]);
   const form = useForm<RegisterFormFields>({
     resolver: zodResolver(schema) as Resolver<RegisterFormFields>,
@@ -135,6 +138,7 @@ export function RegisterForm({ instance }: RegisterFormProps) {
 
   const submit = async (values: RegisterFormFields) => {
     setError(null);
+    setSuccessMessage(null);
 
     try {
       if (instance === "fleet_manager") {
@@ -149,7 +153,14 @@ export function RegisterForm({ instance }: RegisterFormProps) {
             ? await signUpDriver(values as unknown as DriverRegisterValues)
             : await signUpRoadsideOperator(values as unknown as RoadsideRegisterValues);
 
-      navigate(instance === "customer" ? "/onboarding" : getDashboardPathForRole(profile));
+      if (profile.needsEmailConfirmation) {
+        setSuccessMessage(
+          `Contul a fost creat în Supabase pentru ${profile.profile.email}. Confirmă emailul, apoi intră în cont cu parola aleasă.`
+        );
+        return;
+      }
+
+      navigate(instance === "customer" ? "/onboarding" : getDashboardPathForRole(profile.profile));
     } catch (nextError) {
       setError(nextError instanceof Error ? nextError.message : "Înregistrarea nu a reușit.");
     }
@@ -171,10 +182,42 @@ export function RegisterForm({ instance }: RegisterFormProps) {
           <Input type="tel" placeholder="+40 700 000 000" {...form.register("phone")} />
         </Field>
         <Field label="Parolă" error={form.formState.errors.password?.message}>
-          <Input type="password" placeholder="minimum 8 caractere" {...form.register("password")} />
+          <div className="relative">
+            <Input
+              type={passwordVisible ? "text" : "password"}
+              placeholder="minimum 8 caractere"
+              className="pr-11"
+              {...form.register("password")}
+            />
+            <button
+              type="button"
+              onClick={() => setPasswordVisible((visible) => !visible)}
+              className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={passwordVisible ? "Ascunde parola" : "Arată parola"}
+              aria-pressed={passwordVisible}
+            >
+              {passwordVisible ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+            </button>
+          </div>
         </Field>
         <Field label="Confirmare parolă" error={form.formState.errors.confirmPassword?.message}>
-          <Input type="password" placeholder="repetă parola" {...form.register("confirmPassword")} />
+          <div className="relative">
+            <Input
+              type={confirmPasswordVisible ? "text" : "password"}
+              placeholder="repetă parola"
+              className="pr-11"
+              {...form.register("confirmPassword")}
+            />
+            <button
+              type="button"
+              onClick={() => setConfirmPasswordVisible((visible) => !visible)}
+              className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={confirmPasswordVisible ? "Ascunde confirmarea parolei" : "Arată confirmarea parolei"}
+              aria-pressed={confirmPasswordVisible}
+            >
+              {confirmPasswordVisible ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+            </button>
+          </div>
         </Field>
       </section>
 
@@ -316,6 +359,11 @@ export function RegisterForm({ instance }: RegisterFormProps) {
       )}
 
       {error && <p className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
+      {successMessage && (
+        <p className="rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm font-medium text-primary" role="status">
+          {successMessage}
+        </p>
+      )}
 
       <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
         <UserPlus className="h-4 w-4" />

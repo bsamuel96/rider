@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Chrome, LogIn, MessageSquareText } from "lucide-react";
+import { Chrome, Eye, EyeOff, LogIn, MessageSquareText } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -27,6 +27,7 @@ const buttonText: Record<AuthInstance, string> = {
 export function LoginForm({ instance }: LoginFormProps) {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(customerLoginSchema),
     defaultValues: {
@@ -87,7 +88,24 @@ export function LoginForm({ instance }: LoginFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="password">Parolă</Label>
-        <Input id="password" type="password" placeholder="minimum 8 caractere" {...form.register("password")} />
+        <div className="relative">
+          <Input
+            id="password"
+            type={passwordVisible ? "text" : "password"}
+            placeholder="minimum 8 caractere"
+            className="pr-11"
+            {...form.register("password")}
+          />
+          <button
+            type="button"
+            onClick={() => setPasswordVisible((visible) => !visible)}
+            className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={passwordVisible ? "Ascunde parola" : "Arată parola"}
+            aria-pressed={passwordVisible}
+          >
+            {passwordVisible ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+          </button>
+        </div>
         {form.formState.errors.password && <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>}
         <Link to="/auth/forgot-password" className="inline-block text-xs font-semibold text-primary">
           Ai uitat parola?
